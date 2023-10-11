@@ -9,7 +9,7 @@ eel.init('web', allowed_extensions=['.js', '.html'])
 ##Initialiser la connexion BL
 #Rajouter un callBack qui permet de mettre à jour dans eel
 try:
-    bl_conn = SocketManager()
+    bl_conn = SocketManager("local")
 except Exception as e:
     print(e)
     running = False

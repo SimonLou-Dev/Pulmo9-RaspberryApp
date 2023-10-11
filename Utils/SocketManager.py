@@ -1,4 +1,4 @@
-import socket, subprocess, time, threading
+import socket, subprocess, time, threading, json, eel
 
 bl = False
 
@@ -24,10 +24,14 @@ class SocketManager:
         elif _socketType == "local":
             self.__DevConnection()
         self.currentSocket.settimeout(5)
-        message = "Conn:OK"
+        message = self.__CommandToJSON("connection")
         self.currentSocket.send(message.encode()) #Envoi de la confirmation de connexion
         print("Waiting for ConnCallBack")
         self.__WaitForConn() #Attente de la réponse du serveur
+
+    def __CommandToJSON(self, command):
+        x = {"command": command}
+        return json.dumps(x)
 
     #Methode privée pour la connexion bluetooth
     def __btConnection(self):
@@ -65,21 +69,60 @@ class SocketManager:
             recive = None
             try:
                 data = self.currentSocket.recv(2048)
-                recive = data.decode()
+                recive =  data.decode()
+
             except:
-                recive = recive
-                
- 
-            if recive == "ConnCallBack:ok": #Si la réponse est positive, la connexion est établie
+                recive = ""
+
+            if len(recive) == 0:
+                continue
+
+            try:
+                recive = json.loads(recive)
+            except Exception as e:
+                print(e)
+
+            if recive["command"] == "connection:ACK": #Si la réponse est positive, la connexion est établie
                 recived = True
                 self.connIsOk = True
                 print("Device connected")
+                eel.Auth_setBlConnected()
                 return True
+
             if time.time() - time_start > 20: #Si le temps d'attente est dépassé, la connexion est échouée
                 print("Connexion échouée")
                 recived = True
                 break
-    
+
+    #Mettre dans une boucle
+    def __startPingPong(self):
+        time_start = time.time()
+        launched = False
+        launchedTime = time.time()
+        if time.time() - time_start >= 120:  # Si le temps d'attente est dépassé, la connexion est échouée
+            self.__CommandToJSON("ping")
+            launched = True
+            launchedTime = time.time()
+
+        if launched and time.time() - launchedTime >= 30:
+            print("timeout")
+
+        try:
+            data = self.currentSocket.recv(2048)
+            recive = data.decode()
+
+        except:
+            recive = ""
+
+        try:
+            recive = json.loads(recive)
+        except Exception as e:
+            print(e)
+
+        if recive["command"] == "pong":  # Si la réponse est positive, la connexion est établie
+            launched = False
+
+
     #Methode pemettant de savoir si la connexion est établie
     def getConState(self):
         return self.connIsOk
