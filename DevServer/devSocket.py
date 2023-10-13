@@ -4,6 +4,8 @@ import threading
 #Variables for holding information about connections
 connections = []
 total_connections = 0
+SEND_BUF_SIZE = 143360
+RECV_BUF_SIZE = 143360
 
 #Client class, new instance created for each connected client
 #Each instance has the socket and address that is associated with items
@@ -57,10 +59,26 @@ def main():
 
     #Create new server socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    bufsize = sock.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+    print ("Buffer size [Before]:%d" %bufsize)
+
+    sock.setsockopt(socket.SOL_TCP,
+                    socket.TCP_NODELAY, 1)
+    sock.setsockopt(
+        socket.SOL_SOCKET,
+        socket.SO_SNDBUF,
+        SEND_BUF_SIZE)
+    sock.setsockopt(
+        socket.SOL_SOCKET,
+        socket.SO_RCVBUF,
+        RECV_BUF_SIZE)
     sock.bind((host, port))
     sock.listen(5)
 
     #Create new thread to wait for connections
+    bufsize = sock.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+    print ("Buffer size [After]:%d" %bufsize)
     newConnectionsThread = threading.Thread(target = newConnections, args = (sock,))
     newConnectionsThread.start()
     
