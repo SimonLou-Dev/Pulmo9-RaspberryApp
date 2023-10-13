@@ -187,7 +187,6 @@ class SocketManager:
                 # Données dans recive["data"]
 
     # Methode permettant d'attendre la confirmation de lecture
-    # TODO : Rajouter un Timeout et mettre la connexion hors line
     def __waitACK(self):
         ackRecive = False
 
