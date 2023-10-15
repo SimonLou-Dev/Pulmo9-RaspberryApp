@@ -37,7 +37,7 @@ class SocketManager:
         print("Waiting for ConnCallBack")
         self.__WaitForConn() #Attente de la réponse du serveur
 
-    # Convertit la command en un string JSON pour l'envoyer
+    # Convertit la command en un dictionnaire
     def __CommandToSet(self, command):
         x = {"command": command}
         return x
@@ -88,14 +88,12 @@ class SocketManager:
             if len(recive) == 0:
                 continue
 
-            try:
-                recive = json.loads(recive)
-            except Exception as e:
-                print(e)
+            decodeMessage = self.__decodeMessage(recive)
 
-            if recive["command"] == "connection:ACK": #Si la réponse est positive, la connexion est établie
-                seq = recive["seqNumber"]
-                self.__sendList.pop(seq)
+            if decodeMessage == "":
+                continue
+
+            if decodeMessage["command"] == "connection:ACK":
                 recived = True
                 self.connIsOk = True
                 print("Device connected")
@@ -109,10 +107,23 @@ class SocketManager:
 
     def __sendMessage(self, message):
         message["seqNumber"] = self.__seqNumber
-        self.__seqNumber += 1
         self.__sendList[self.__seqNumber] = message
+        self.__seqNumber += 1
         jsonStr = json.dumps(message)
         self.currentSocket.send(jsonStr.encode())
+
+    def __decodeMessage(self, recivedMessage):
+        try:
+            recivedMessage = json.loads(recivedMessage)
+        except Exception as e:
+            print(e)
+
+        if("seqNumber" in  self.__sendList):
+            self.__sendList.pop(recivedMessage["seqNumber"])
+            return recivedMessage
+
+        return ""
+
 
     #Fonction qui permet de vérifier létat de la connextion toutes les 120 secondes avec un timeout de 30Sec
     def __startPingPong(self):
@@ -176,7 +187,7 @@ class SocketManager:
         self.__waitACK()
 
     # Methode permettant de lire les données de mesures et de les envoyer à son Model, (renvoi un ACK)
-    def __readMesureData(selfs):
+    def __readMesureData(self):
         stopped = False
         time_start = time.time()
         while not stopped:

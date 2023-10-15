@@ -31,6 +31,8 @@ eel.start('templates/index.html',jinja_templates="templates", block=False) #, cm
 
 # login(callBack)
 
+# logout(callback)
+
 #  get_patients(string search = "", int page = 0)
 
 # get_patient(int id)
@@ -50,9 +52,6 @@ eel.start('templates/index.html',jinja_templates="templates", block=False) #, cm
 # set_freq(int frequency);
 
 #Fin des fonction eel
-
-
-
 
 
 #Fonction qui permet de lancer le serveur en arrière plan Après l'éxecution de tout ce qu'il y a avant;
