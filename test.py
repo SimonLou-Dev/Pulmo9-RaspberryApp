@@ -10,8 +10,9 @@ if "00:18:E4:00:14:25" not in stdoutdata.split(): #Recherche de l'adresse MAC du
     except Exception as erreur:
         print("Connexion échouée, restart and , send message to user")
         print(str(erreur))
+        socket = None
 
-while True:
+while True and socket != None:
     message = socket.recv(2048)
     message = message.decode()
     if message == "exit":
