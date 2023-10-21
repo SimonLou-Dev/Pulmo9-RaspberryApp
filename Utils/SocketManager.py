@@ -20,6 +20,7 @@ class SocketManager:
     connIsOk = False
     __sendList = {}
     __seqNumber = 0
+    __threads = []
 
     #Constructeur de la classe, BT par défaut pour une connexion bluetooth et local pour le dévellopement
     def __init__(self, _socketType = "bt"):
@@ -69,6 +70,7 @@ class SocketManager:
     # Methode privée pour attendre la réponse du serveur
     def __WaitForConn(self):
         callBackConn = threading.Thread(target = self.__listenCallBack)
+        self.__threads.append(callBackConn)
         callBackConn.start()
         
     #Methode privée pour écouter la réponse du serveur utilsée en thread
@@ -111,6 +113,7 @@ class SocketManager:
         self.__seqNumber += 1
         jsonStr = json.dumps(message)
         self.currentSocket.send(jsonStr.encode())
+
 
     def __decodeMessage(self, recivedMessage):
         try:
@@ -166,19 +169,25 @@ class SocketManager:
     def configure(self, debit, pression):
         data = {"command": "calibrate", "debit": debit, "pression": pression}
         self.__sendMessage(data)
-        self.__waitACK()
+        ackWait = threading.Thread(target = self.__waitACK)
+        self.__threads.append(ackWait)
+        ackWait.start()
 
     # Methode permmettant de changer la fréquence de l'ampli
     def changeFrequency(self, freq):
-        data = {"command": "changeFreq", "frequency": freq, "seqNumber": self.__seqNumber}
+        data = {"command": "changeFreq", "frequency": freq}
         self.__sendMessage(data)
-        self.__waitACK()
+        ackWait = threading.Thread(target = self.__waitACK)
+        self.__threads.append(ackWait)
+        ackWait.start()
 
     # Methode permettant de démarer une mesure
     def startMesure(self):
         data = self.__CommandToSet("startMesure")
         self.__sendMessage(data)
-        self.__waitACK()
+        ackWait = threading.Thread(target = self.__waitACK)
+        self.__threads.append(ackWait)
+        ackWait.start()
         self.__readMesureData()
 
     def stopMesure(self):

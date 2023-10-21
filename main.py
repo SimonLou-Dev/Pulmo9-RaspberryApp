@@ -1,7 +1,9 @@
 import eel, threading, time, sys
 from Utils.SocketManager import SocketManager
+from Utils.Controle_BdD import Controle_BdD
 
 running = True;
+database = Controle_BdD("database").getConnexion()
 
 #Creation de l'objet eel en mode wb et en authorisant les extensions .js et .html
 eel.init('web', allowed_extensions=['.js', '.html'])
