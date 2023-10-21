@@ -46,13 +46,13 @@ class SocketManager:
     def __btConnection(self):
         print("TryBtConnexion")
         stdoutdata = subprocess.getoutput("hcitool con")
-        if "98:D3:11:FC:84:44" not in stdoutdata.split(): #Recherche de l'adresse MAC du serveur
+        if "00:18:E4:00:14:25" not in stdoutdata.split(): #Recherche de l'adresse MAC du serveur
             try:
-                self.currentSocket = bluetooth.BluetoothSocket( bluetooth.RFCOMM ) #Création du socket bluetooth
-                self.currentSocket.connect(("98:D3:11:FC:84:44", 1)) #Connexion au serveur
-
+                self.currentSocket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM) #Création du socket
+                self.currentSocket.connect(("00:18:E4:00:14:25", 1)) #Connexion au serveur
+                print("Connexion établie")
             except Exception as erreur:
-                print("Connexion échouée, nouvel essai")
+                print("Connexion échouée, restart and , send message to user")
                 print(str(erreur))
 
     #Methode privée pour la connexion locale
