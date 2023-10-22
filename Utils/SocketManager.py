@@ -88,29 +88,26 @@ class SocketManager:
             data = self.currentSocket.recv(2048)
             recive =  data.decode()
             final += recive
-
             if(final.find("\r\n") != -1):
                 print("income packet")
                 incomeJson = json.loads(final)
-                match incomeJson["command"]:
-                    case "connection:ACK":
-                        self.connIsOk = True
-                        print("Device connected")
-                        eel.Auth_setBlConnected()
-                        break
+                command = incomeJson["command"]
+                if command == "connection:ACK":
+                    self.connIsOk = True
+                    print("Device connected")
+                    eel.Auth_setBlConnected()
+                elif command == "recive:ACK":
+                    self.__markMessageAsRecived(incomeJson)
+                    break
+                elif command == "pong":
+                    self.__markMessageAsRecived(incomeJson)
+                    self.__pingLaunched = False
+                    self.connIsOk = True
+                    #Mettre à  jour l'interface en connecté
+                else:
+                    print("Unknown command")
+                    break
 
-                    case "recive:ACK":
-                        self.__markMessageAsRecived(incomeJson)
-                        break
-
-                    case "pong":
-                        self.__markMessageAsRecived(incomeJson)
-                        self.__pingLaunched = False
-                        self.connIsOk = True
-                        #Mettre à  jour l'interface en connecté
-                    case _:
-                        print("Unknown command")
-                        break
 
     def __markMessageAsRecived(self, message):
         seq = message["seqNumber"]
