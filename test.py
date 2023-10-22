@@ -1,6 +1,6 @@
 import json, socket, subprocess
 
-buffer = ''
+
 
 stdoutdata = subprocess.getoutput("hcitool con")
 if "00:18:E4:00:14:25" not in stdoutdata.split(): #Recherche de l'adresse MAC du serveur
@@ -13,25 +13,15 @@ if "00:18:E4:00:14:25" not in stdoutdata.split(): #Recherche de l'adresse MAC du
         print(str(erreur))
         socket = None
 
+
+final = ""
 while True and socket != None:
-    data = socket.recv(1024)
-    if not data:
-        break
 
-        # add the current data read by the socket to a temporary buffer
-    buffer += data
+    message = socket.recv(16384)
+    message = message.decode()
+    final += message
 
-    # search complete messages
-    messages = buffer.split('\r\r')
-
-    # we need at least 2 messages to continue
-    if len(messages) == 1:
-        continue
-
-    # seperator found, iterate across complete messages
-    for message in messages [:-1]:
-        # handle here the message
-        print message
-
-    # set the buffer with the last cutted message
-    buffer = messages [-1]
+    if(final.find("\r\n") != -1):
+        print(final)
+        print(json.loads(final))
+        final = ""

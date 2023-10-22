@@ -18,9 +18,13 @@ class SocketManager:
     socketType = ""
     currentSocket = None
     connIsOk = False
+    running = True
     __sendList = {}
     __seqNumber = 0
     __threads = []
+
+    __pingLaunched = False
+    __pingLaunchedTime = time.time()
 
     #Constructeur de la classe, BT par défaut pour une connexion bluetooth et local pour le dévellopement
     def __init__(self, _socketType = "bt"):
@@ -35,8 +39,19 @@ class SocketManager:
         message = self.__CommandToSet("connection")
         self.__sendMessage(message)
 
-        print("Waiting for ConnCallBack")
-        self.__WaitForConn() #Attente de la réponse du serveur
+        self.__threads.append(threading.Thread(target=self.__listener))
+        self.__threads.append(threading.Thread(target=self.__ping))
+        for thread in self.__threads:
+            thread.start()
+
+
+    def stopBluetooth(self):
+        self.running = False
+        for thread in self.__threads:
+            thread.join()
+        print("Bluetooth stopped")
+        self.currentSocket.close()
+
 
     # Convertit la command en un dictionnaire
     def __CommandToSet(self, command):
@@ -66,46 +81,40 @@ class SocketManager:
         bufsize = self.currentSocket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
         print ("Buffer size [Before]:%d" %bufsize)
 
-    
-    # Methode privée pour attendre la réponse du serveur
-    def __WaitForConn(self):
-        callBackConn = threading.Thread(target = self.__listenCallBack)
-        self.__threads.append(callBackConn)
-        callBackConn.start()
-        
-    #Methode privée pour écouter la réponse du serveur utilsée en thread
-    def __listenCallBack(self):
-        recived = False
-        time_start = time.time()
-    
-        while not recived:
-            recive = None
-            try:
-                data = self.currentSocket.recv(2048)
-                recive =  data.decode()
+    def __listener(self):
+        print("[DEBUG] Démarage du thread d'écoutte")
+        final = ""
+        while self.running:
+            data = self.currentSocket.recv(2048)
+            recive =  data.decode()
+            final += recive
 
-            except:
-                recive = ""
+            if(final.find("\r\n") != -1):
+                print("income packet")
+                incomeJson = json.loads(final)
+                match incomeJson["command"]:
+                    case "connection:ACK":
+                        self.connIsOk = True
+                        print("Device connected")
+                        eel.Auth_setBlConnected()
+                        break
 
-            if len(recive) == 0:
-                continue
+                    case "recive:ACK":
+                        self.__markMessageAsRecived(incomeJson)
+                        break
 
-            decodeMessage = self.__decodeMessage(recive)
+                    case "pong":
+                        self.__markMessageAsRecived(incomeJson)
+                        self.__pingLaunched = False
+                        self.connIsOk = True
+                        #Mettre à  jour l'interface en connecté
+                    case _:
+                        print("Unknown command")
+                        break
 
-            if decodeMessage == "":
-                continue
-
-            if decodeMessage["command"] == "connection:ACK":
-                recived = True
-                self.connIsOk = True
-                print("Device connected")
-                eel.Auth_setBlConnected()
-                return True
-
-            if time.time() - time_start > 20: #Si le temps d'attente est dépassé, la connexion est échouée
-                print("Connexion échouée")
-                recived = True
-                break
+    def __markMessageAsRecived(self, message):
+        seq = message["seqNumber"]
+        self.__sendList.pop(seq)
 
     def __sendMessage(self, message):
         message["seqNumber"] = self.__seqNumber
@@ -115,51 +124,25 @@ class SocketManager:
         self.currentSocket.send(jsonStr.encode())
 
 
-    def __decodeMessage(self, recivedMessage):
-        try:
-            recivedMessage = json.loads(recivedMessage)
-        except Exception as e:
-            print(e)
-
-        if("seqNumber" in  self.__sendList):
-            self.__sendList.pop(recivedMessage["seqNumber"])
-            return recivedMessage
-
-        return ""
-
-
     #Fonction qui permet de vérifier létat de la connextion toutes les 120 secondes avec un timeout de 30Sec
-    def __startPingPong(self):
-        time_start = time.time()
-        launched = False
-        launchedTime = time.time()
-        if time.time() - time_start >= 120:  # Si le temps d'attente est dépassé, la connexion est échouée
-            command = self.__CommandToSet("ping")
-            self.__sendMessage(command)
-            launched = True
-            launchedTime = time.time()
+    def __sendPing(self):
 
-        if launched and time.time() - launchedTime >= 30:
-            print("timeout")
-            self.connIsOk = False
+        while self.running:
+            self.__pingLaunched = False #Ping en cours
+            self.__pingLaunchedTime = time.time() #heure du démarage du dernier ping
 
-        try:
-            data = self.currentSocket.recv(2048)
-            recive = data.decode()
+            if time.time() - self.__pingLaunchedTime >= 120:
+                command = self.__CommandToSet("ping")
+                self.__sendMessage(command)
+                self.__pingTimeStart = True
+                self.__pingLaunchedTime = time.time()
 
-        except:
-            recive = ""
+            if self.__pingLaunched and time.time() - self.__pingLaunchedTime >= 30:
+                self.connIsOk = False
+                print("timeout")
+                #Send une notif eel pour dire que la connexion est perdue
 
-        try:
-            recive = json.loads(recive)
-        except Exception as e:
-            print(e)
 
-        if recive["command"] == "pong":  # Si la réponse est positive, la connexion est
-            seq = recive["seqNumber"]
-            self.__sendList.pop(seq)
-            launched = False
-            self.connIsOk = True
 
     #Methode pemettant de savoir si la connexion est établie
     def getConState(self):
@@ -169,80 +152,20 @@ class SocketManager:
     def configure(self, debit, pression):
         data = {"command": "calibrate", "debit": debit, "pression": pression}
         self.__sendMessage(data)
-        ackWait = threading.Thread(target = self.__waitACK)
-        self.__threads.append(ackWait)
-        ackWait.start()
 
     # Methode permmettant de changer la fréquence de l'ampli
     def changeFrequency(self, freq):
         data = {"command": "changeFreq", "frequency": freq}
         self.__sendMessage(data)
-        ackWait = threading.Thread(target = self.__waitACK)
-        self.__threads.append(ackWait)
-        ackWait.start()
 
     # Methode permettant de démarer une mesure
     def startMesure(self):
         data = self.__CommandToSet("startMesure")
         self.__sendMessage(data)
-        ackWait = threading.Thread(target = self.__waitACK)
-        self.__threads.append(ackWait)
-        ackWait.start()
-        self.__readMesureData()
 
     def stopMesure(self):
         data = self.__CommandToSet("stopMesure")
-        self.__sendMessage(data)
-        self.__waitACK()
 
-    # Methode permettant de lire les données de mesures et de les envoyer à son Model, (renvoi un ACK)
-    def __readMesureData(self):
-        stopped = False
-        time_start = time.time()
-        while not stopped:
-            recive = None
-            try:
-                data = self.currentSocket.recv(2048)
-                recive = data.decode()
-            except:
-                recive = ""
 
-            if len(recive) == 0:
-                continue
 
-            try:
-                recive = json.loads(recive)
-            except Exception as e:
-                print(e)
 
-            if recive["command"] == "sendData":  # Si la commande est send  data je lis sinon tant pis
-                if recive["ended"] == True: stopped = True  # Si c'est la dernière mesure qui est envoyé
-
-                print(recive["data"])
-                # Données dans recive["data"]
-
-    # Methode permettant d'attendre la confirmation de lecture
-    def __waitACK(self):
-        ackRecive = False
-
-        while not ackRecive:
-            recive = None
-            try:
-                data = self.currentSocket.recv(2048)
-                recive = data.decode()
-            except:
-                recive = ""
-
-            if len(recive) == 0:
-                continue
-
-            try:
-                recive = json.loads(recive)
-            except Exception as e:
-                print(e)
-
-            if recive["command"] == "recive:ACK":  # Si la commande est l'acknoledgement je ferme la boucle et je quitte
-                seq = recive["seqNumber"]
-                self.__sendList.pop(seq)
-                ackRecive = True
-                return

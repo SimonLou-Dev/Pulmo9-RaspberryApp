@@ -59,7 +59,9 @@ eel.start('templates/index.html',jinja_templates="templates", block=False) #, cm
 #Fonction qui permet de lancer le serveur en arrière plan Après l'éxecution de tout ce qu'il y a avant;
 # /!\ Attention : C'est  bloquant
 while running:
-    eel.sleep(1);
+    eel.sleep(1)
+
+bl_conn.stopBluetooth()
 
 
 
