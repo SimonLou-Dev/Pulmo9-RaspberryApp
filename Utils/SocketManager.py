@@ -38,9 +38,9 @@ class SocketManager:
         self.currentSocket.settimeout(5)
         message = self.__CommandToSet("connection")
         self.__sendMessage(message)
-
+        self.running = True
         self.__threads.append(threading.Thread(target=self.__listener))
-        self.__threads.append(threading.Thread(target=self.__ping))
+        self.__threads.append(threading.Thread(target=self.__sendPing))
         for thread in self.__threads:
             thread.start()
 

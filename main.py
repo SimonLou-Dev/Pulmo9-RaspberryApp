@@ -3,27 +3,36 @@ from Utils.SocketManager import SocketManager
 from Utils.Controle_BdD import Controle_BdD
 
 running = True;
-database = Controle_BdD("database").getConnexion()
+eel_thread = None
+#database = Controle_BdD("database").getConnexion()
 
 #Creation de l'objet eel en mode wb et en authorisant les extensions .js et .html
-eel.init('web', allowed_extensions=['.js', '.html'])
+
 
 ##Initialiser la connexion BL
 #Rajouter un callBack qui permet de mettre à jour dans eel
 try:
-    bl_conn = SocketManager("bt")
+    bl_conn = SocketManager("local")
 except Exception as e:
     print(e)
     running = False
     sys.exit()
 
 ## Démarage de l'app
-eel.start('templates/index.html',jinja_templates="templates", block=False) #, cmdline_args=['--kiosk']
+
 
 ##Start la connexion à la BDD
 
 
 #Fonctions qui permettent à l'eel de communiquer
+
+@eel.expose
+def sendClose():
+    running = False
+    print("Request app closure")
+    bl_conn.stopBluetooth()
+    return "App closed"
+
 
 # get_doctors(void)
 
@@ -56,12 +65,23 @@ eel.start('templates/index.html',jinja_templates="templates", block=False) #, cm
 #Fin des fonction eel
 
 
+
+
+
 #Fonction qui permet de lancer le serveur en arrière plan Après l'éxecution de tout ce qu'il y a avant;
 # /!\ Attention : C'est  bloquant
-while running:
-    eel.sleep(1)
+if len(sys.argv) > 1 and sys.argv[1] == "--dev":
+    eel.init("client")
+    eel.start({"port": 5173, "host":"127.0.0.1"}, host="127.0.0.1", port=8888) #, cmdline_args=['--kiosk']
+else:
+    eel.init("web")
+    eel.start('./', port=8888, mode="chrome")
 
-bl_conn.stopBluetooth()
+
+
+#bl_conn.stopBluetooth()
+
+
 
 
 
