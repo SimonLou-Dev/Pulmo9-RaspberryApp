@@ -12,7 +12,7 @@ export const Login = (props) => {
 
 
     const test =  async () => {
-        eel.sendClose()()
+
     }
 
 

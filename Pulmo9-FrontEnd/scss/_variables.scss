@@ -38,6 +38,11 @@ $border-radius: 10px;
   @return 0 0 $blur $size $color;
 }
 
+.red-glow{
+  text-shadow: text_glow($green_light);
+  color: $green_light;
+}
+
 .hidden{
   display: none;
   visibility: hidden;
@@ -216,16 +221,24 @@ a{
 .form-error{
   border: $red_light 1px solid !important;
 }
-.errors-list{
-  li{
+.errors-list {
+  li {
     font-size: 20px;
     font-weight: 400;
     color: red;
   }
-  ul{
+
+  ul {
     margin: 0;
   }
+
   font-family: "Baloo 2";
   font-weight: 500;
   color: $boom;
+}
+/* */
+.flex-row-evenly{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }

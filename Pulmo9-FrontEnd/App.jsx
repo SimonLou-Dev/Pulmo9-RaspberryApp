@@ -10,30 +10,41 @@ import {Login} from "./Views/Auth/Login.jsx";
 import {Register} from "./Views/Auth/Register.jsx";
 import {PatientList} from "./Views/Patient/PatientList.jsx";
 import {NoMatchRoute} from "./components/Utils/NoMatchRoute.jsx";
+import {WaitAuth} from "./Views/WaitAuth.jsx";
 
 
 function App() {
     const [user, setUser] = useState(null)
-    const [count, setCount] = useState(0)
+    const [blConnected, setBlConnected] = useState(false)
 
     useEffect(() => {
         eel.set_host("ws://localhost:8888");
 
-        return () => {
+        window.addEventListener("unload", (event) => {
+            eel.sendClose()();
+        });
 
-        }
+        window.addEventListener("blTimeout", (event) => {
+          setBlConnected(false)
+        })
+
+        window.addEventListener("blConnected", (event) => {
+            setBlConnected(false)
+        })
+
+
     }, []);
 
     return (
 
-            <UserContext.Provider value={{user: user, setUser: (v) => setUser(v)}}>
+            <UserContext.Provider value={{user: user, setUser: (v) => setUser(v), blConnected:blConnected}}>
                 <Routes>
                     <Route path="/login" element={<Login/>}/>
                     <Route path={"/register"} element={<Register/>}/>
-
+                    <Route index element={<WaitAuth/>} />
                     <Route path={"/"}  element={<Layout />}>
                         <Route path={"patients"} element={<PatientList/>}/>
-                        <Route index element={<NoMatchRoute/>} />
+
                     </Route>
                 </Routes>
             </UserContext.Provider>

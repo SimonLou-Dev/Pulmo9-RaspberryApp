@@ -9,7 +9,7 @@ msg = input("ClientA: Entrez un message ou exit pour sortir:")
 
 while msg != 'exit':
     message = input("->")
-    currentSocket.sendall(message.encode())
+    currentSocket.sendall(bytes(message + "\n\r\n", 'UTF-8'))
     if message == "exit":
         break;
 

@@ -1,9 +1,11 @@
-import eel
+
 import json
 import socket
 import subprocess
 import threading
 import time
+from Utils.Logger import Logger
+
 
 bl = False
 
@@ -23,11 +25,16 @@ class SocketManager:
     __seqNumber = 0
     __threads = []
 
+    __eel= None
+
+    __logger = Logger()
+
     __pingLaunched = False
     __pingLaunchedTime = time.time()
 
     #Constructeur de la classe, BT par défaut pour une connexion bluetooth et local pour le dévellopement
-    def __init__(self, _socketType = "bt"):
+    def __init__(self, eel, _socketType = "bt"):
+        self.__eel = eel
         if not bl and _socketType == "bt":
             raise Exception("Impossible d'établir une conenxtion avec le bluetooth")
         self.socketType = _socketType
@@ -35,7 +42,7 @@ class SocketManager:
             self.__btConnection()
         elif _socketType == "local":
             self.__DevConnection()
-        self.currentSocket.settimeout(5)
+        self.currentSocket.settimeout(600)
         message = self.__CommandToSet("connection")
         self.__sendMessage(message)
         self.running = True
@@ -47,9 +54,10 @@ class SocketManager:
 
     def stopBluetooth(self):
         self.running = False
+        self.__logger.print("SocketManager", 1, "Attente de la fermeture de la connexion bluetooth")
         for thread in self.__threads:
-            thread.join()
-        print("Bluetooth stopped")
+            thread.join(1)
+        self.__logger.print("SocketManager", 1, "Fermeture de la connexion bluetooth")
         self.currentSocket.close()
 
 
@@ -60,52 +68,60 @@ class SocketManager:
 
     #Methode privée pour la connexion bluetooth
     def __btConnection(self):
-        print("TryBtConnexion")
+        self.__logger.print("SocketManager", 1, "Tentative de connexion bluetooth")
         stdoutdata = subprocess.getoutput("hcitool con")
         if "00:18:E4:00:14:25" not in stdoutdata.split(): #Recherche de l'adresse MAC du serveur
             try:
                 self.currentSocket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM) #Création du socket
                 self.currentSocket.connect(("00:18:E4:00:14:25", 1)) #Connexion au serveur
-                print("Connexion établie")
+                self.__logger.print("SocketManager", 1, "Connecté à l'appareil bluetooth")
             except Exception as erreur:
-                print("Connexion échouée, restart and , send message to user")
+                self.__logger.print("SocketManager", 3, "Impossible d'ouvrir la connexion bluetooth")
                 print(str(erreur))
 
     #Methode privée pour la connexion locale
     def __DevConnection(self):
-        print("TryLocal")
+        self.__logger.print("SocketManager", 1, "Connexion au socket AF INET")
         host = socket.gethostname() #Récupération de l'adresse IP du serveur
         port = 5000  # socket server port number
         self.currentSocket = socket.socket() #Création du socket
         self.currentSocket.connect((host, port)) #Connexion au serveur
-        bufsize = self.currentSocket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
-        print ("Buffer size [Before]:%d" %bufsize)
+
 
     def __listener(self):
-        print("[DEBUG] Démarage du thread d'écoutte")
+        self.__logger.print("SocketManager", 1, "Ecoute des messages arrivants")
         final = ""
         while self.running:
-            data = self.currentSocket.recv(2048)
+            print("Current status "  + self.running.__str__())
+            try:
+                data = self.currentSocket.recv(2048)
+            except Exception as e:
+                print(e)
+                continue
+            if not data:
+                continue
             recive =  data.decode()
             final += recive
+            print("C'est un bon ? " + final.find("\r\n").__str__())
             if(final.find("\r\n") != -1):
-                print("income packet")
+                print("Je suis dans le message")
                 incomeJson = json.loads(final)
                 command = incomeJson["command"]
                 if command == "connection:ACK":
                     self.connIsOk = True
-                    print("Device connected")
-                    eel.Auth_setBlConnected()
+                    self.__logger.print("SocketManager", 1, "Connexion confirmée")
+                    self.__eel.bl_is_connected()
                 elif command == "recive:ACK":
                     self.__markMessageAsRecived(incomeJson)
                     break
                 elif command == "pong":
+                    self.__logger.print("SocketManager", 1, "Appreil toujours connecté")
                     self.__markMessageAsRecived(incomeJson)
                     self.__pingLaunched = False
                     self.connIsOk = True
                     #Mettre à  jour l'interface en connecté
                 else:
-                    print("Unknown command")
+                    self.__logger.print("SocketManager", 2, "Commande inconnue")
                     break
 
 

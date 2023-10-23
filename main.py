@@ -1,9 +1,13 @@
 import eel, threading, time, sys
+
+from Utils.Logger import Logger
 from Utils.SocketManager import SocketManager
 from Utils.Controle_BdD import Controle_BdD
 
+
 running = True;
 eel_thread = None
+logger = Logger()
 #database = Controle_BdD("database").getConnexion()
 
 #Creation de l'objet eel en mode wb et en authorisant les extensions .js et .html
@@ -12,7 +16,7 @@ eel_thread = None
 ##Initialiser la connexion BL
 #Rajouter un callBack qui permet de mettre à jour dans eel
 try:
-    bl_conn = SocketManager("local")
+    bl_conn = SocketManager(eel,"local")
 except Exception as e:
     print(e)
     running = False
@@ -28,10 +32,11 @@ except Exception as e:
 
 @eel.expose
 def sendClose():
+    logger.print("Main", 1, "Demande de fermeture de l'application")
     running = False
-    print("Request app closure")
     bl_conn.stopBluetooth()
-    return "App closed"
+    #Close la connexion à la BDD
+    logger.print("Main", 1, "Processus backend terminé")
 
 
 # get_doctors(void)
@@ -62,7 +67,12 @@ def sendClose():
 
 # set_freq(int frequency);
 
-#Fin des fonction eel
+#Fin des fonction eel exportés
+
+#Début des call vers le JS
+
+def bl_connected():
+    eel.bl_is_connected()
 
 
 
@@ -78,8 +88,6 @@ else:
     eel.start('./', port=8888, mode="chrome")
 
 
-
-#bl_conn.stopBluetooth()
 
 
 
