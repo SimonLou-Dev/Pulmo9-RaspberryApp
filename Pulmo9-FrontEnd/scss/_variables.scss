@@ -38,7 +38,7 @@ $border-radius: 10px;
   @return 0 0 $blur $size $color;
 }
 
-.red-glow{
+.green-glow{
   text-shadow: text_glow($green_light);
   color: $green_light;
 }

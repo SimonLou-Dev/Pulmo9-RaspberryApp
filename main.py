@@ -8,6 +8,17 @@ from Utils.Controle_BdD import Controle_BdD
 running = True;
 eel_thread = None
 logger = Logger()
+
+
+
+
+
+try:
+    bl_conn = SocketManager(eel,"local")
+except Exception as e:
+    print(e)
+    running = False
+    sys.exit()
 #database = Controle_BdD("database").getConnexion()
 
 #Creation de l'objet eel en mode wb et en authorisant les extensions .js et .html
@@ -15,12 +26,7 @@ logger = Logger()
 
 ##Initialiser la connexion BL
 #Rajouter un callBack qui permet de mettre à jour dans eel
-try:
-    bl_conn = SocketManager(eel,"local")
-except Exception as e:
-    print(e)
-    running = False
-    sys.exit()
+
 
 ## Démarage de l'app
 
@@ -71,8 +77,9 @@ def sendClose():
 
 #Début des call vers le JS
 
-def bl_connected():
-    eel.bl_is_connected()
+@eel.expose
+def get_socket_status():
+    return bl_conn.getConState()
 
 
 

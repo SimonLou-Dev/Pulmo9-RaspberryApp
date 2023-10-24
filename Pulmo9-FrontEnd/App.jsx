@@ -1,7 +1,4 @@
 import {useEffect, useState} from 'react'
-
-
-import {eel} from './eel.js';
 import {Route, Routes} from "react-router-dom"
 
 import {Layout} from "./Views/Layout.jsx";
@@ -11,6 +8,12 @@ import {Register} from "./Views/Auth/Register.jsx";
 import {PatientList} from "./Views/Patient/PatientList.jsx";
 import {NoMatchRoute} from "./components/Utils/NoMatchRoute.jsx";
 import {WaitAuth} from "./Views/WaitAuth.jsx";
+import {myEel} from "./MyEel.js";
+
+
+/* Custom socket events */
+const blHasTimeout = new CustomEvent('blTimeout', { detail: { message: 'Bluetooth connection timeout' } });
+const blIsConnected = new CustomEvent('blConnected', { detail: { message: 'Bluetooth connection established' } });
 
 
 function App() {
@@ -18,22 +21,36 @@ function App() {
     const [blConnected, setBlConnected] = useState(false)
 
     useEffect(() => {
-        eel.set_host("ws://localhost:8888");
+        myEel.set_host("ws://localhost:8888");
+
+        const interval = setInterval(handleBl, 2000);
 
         window.addEventListener("unload", (event) => {
-            eel.sendClose()();
+            myEel.sendClose()();
         });
 
-        window.addEventListener("blTimeout", (event) => {
-          setBlConnected(false)
-        })
-
-        window.addEventListener("blConnected", (event) => {
-            setBlConnected(false)
-        })
-
+        return () => {
+            clearInterval(interval);
+        }
 
     }, []);
+
+    const handleBl = async () => {
+        await myEel.get_socket_status()().then((r) => {
+            if(blConnected && !r.connected){
+                setBlConnected(false);
+            }else if(!blConnected && r.connected){
+                setBlConnected(true);
+            }
+
+            if(r.timedOut){
+                setBlConnected(false)
+            }
+
+        });
+
+        //window.dispatchEvent(blConnected)
+    }
 
     return (
 

@@ -19,13 +19,17 @@ except:
 class SocketManager:
     socketType = ""
     currentSocket = None
+
     connIsOk = False
     running = True
+    timedOut = False
+
     __sendList = {}
     __seqNumber = 0
     __threads = []
 
-    __eel= None
+
+    __main = None
 
     __logger = Logger()
 
@@ -33,8 +37,8 @@ class SocketManager:
     __pingLaunchedTime = time.time()
 
     #Constructeur de la classe, BT par défaut pour une connexion bluetooth et local pour le dévellopement
-    def __init__(self, eel, _socketType = "bt"):
-        self.__eel = eel
+    def __init__(self, main, _socketType = "bt"):
+        self.__main = main
         if not bl and _socketType == "bt":
             raise Exception("Impossible d'établir une conenxtion avec le bluetooth")
         self.socketType = _socketType
@@ -102,15 +106,18 @@ class SocketManager:
                 continue
             recive =  data.decode()
             final += recive
-            print("C'est un bon ? " + final.find("\r\n").__str__())
             if(final.find("\r\n") != -1):
-                print("Je suis dans le message")
-                incomeJson = json.loads(final)
+                try:
+                    incomeJson = json.loads(final)
+                except Exception as e:
+                    print(e)
+                    final = ""
+                    continue
                 command = incomeJson["command"]
                 if command == "connection:ACK":
                     self.connIsOk = True
+                    self.__markMessageAsRecived(incomeJson)
                     self.__logger.print("SocketManager", 1, "Connexion confirmée")
-                    self.__eel.bl_is_connected()
                 elif command == "recive:ACK":
                     self.__markMessageAsRecived(incomeJson)
                     break
@@ -119,10 +126,13 @@ class SocketManager:
                     self.__markMessageAsRecived(incomeJson)
                     self.__pingLaunched = False
                     self.connIsOk = True
+                    self.timedOut = False
                     #Mettre à  jour l'interface en connecté
                 else:
                     self.__logger.print("SocketManager", 2, "Commande inconnue")
                     break
+                    
+                final = ""
 
 
     def __markMessageAsRecived(self, message):
@@ -139,27 +149,25 @@ class SocketManager:
 
     #Fonction qui permet de vérifier létat de la connextion toutes les 120 secondes avec un timeout de 30Sec
     def __sendPing(self):
-
+        self.__pingLaunched = False #Ping en cours
+        self.__pingLaunchedTime = time.time() #heure du démarage du dernier ping
         while self.running:
-            self.__pingLaunched = False #Ping en cours
-            self.__pingLaunchedTime = time.time() #heure du démarage du dernier ping
-
             if time.time() - self.__pingLaunchedTime >= 120:
                 command = self.__CommandToSet("ping")
                 self.__sendMessage(command)
-                self.__pingTimeStart = True
+                self.__pingLaunched = True
                 self.__pingLaunchedTime = time.time()
 
             if self.__pingLaunched and time.time() - self.__pingLaunchedTime >= 30:
                 self.connIsOk = False
-                print("timeout")
+                self.timedOut = True
                 #Send une notif eel pour dire que la connexion est perdue
 
 
 
     #Methode pemettant de savoir si la connexion est établie
     def getConState(self):
-        return self.connIsOk
+        return {"connected": self.connIsOk, "timedOut": self.timedOut}
 
     # Methode permettant d'envoyer les données de calibrage
     def configure(self, debit, pression):
