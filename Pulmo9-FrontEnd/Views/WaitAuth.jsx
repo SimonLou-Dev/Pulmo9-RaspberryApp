@@ -1,16 +1,23 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import blImage from '../assets/bluetooth.png'
 import userContext from "../components/Context/UserContext.jsx";
 import {myEel} from "../MyEel.js";
+import {Link, useNavigate} from "react-router-dom";
 
 
 export const WaitAuth = (props) => {
+    const user = useContext(userContext)
+    const navigate = useNavigate()
     const context = useContext(userContext)
 
-    const quit = () => {
-        console.log("Fired")
+    useEffect(() => {
+        if(user.user !== null) {
+            navigate("/patients")
+        }
+    }, []);
 
-        myEel.get_doctors()();
+    const quit = () => {
+        window.close()
     }
 
 
@@ -30,8 +37,8 @@ export const WaitAuth = (props) => {
                     }
                 </div>
                 <div className={"auth-card-footer flex-row-evenly"}>
-                    <button  onClick={quit} className={"btn"}>quitter</button>
-                    <button  className={"btn"}>connexion</button>
+                    <button onClick={quit} className={"btn"}>quitter</button>
+                    <Link to={"/login"} className={"btn"}>connexion</Link>
                 </div>
             </div>
         </div>

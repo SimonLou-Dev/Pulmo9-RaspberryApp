@@ -61,7 +61,8 @@ body{
     border-bottom: 1px $boom solid;
   }
   .auth-card-body{
-
+    max-height: 250px;
+    overflow-y: scroll;
   }
   #WaitAuth{
     border-radius: $border-radius;

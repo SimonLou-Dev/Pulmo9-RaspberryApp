@@ -186,12 +186,8 @@ a{
 }
 
 //Form
-.form-column{
-  display: flex;
-  flex-direction: column;
-}
 .form-input{
-  height: 30px;
+  height: 50px;
 }
 .form-error{
   p{
@@ -221,7 +217,7 @@ a{
 .form-error{
   border: $red_light 1px solid !important;
 }
-.errors-list {
+.error-list {
   li {
     font-size: 20px;
     font-weight: 400;
@@ -241,4 +237,17 @@ a{
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+}
+.flex-column{
+  display: flex;
+  flex-direction: column;
+}
+
+.--all-sized{
+  margin: auto;
+  width: 90%;
+}
+
+.scroll-y{
+  overflow-y: scroll;
 }

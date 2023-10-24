@@ -19,11 +19,12 @@ const blIsConnected = new CustomEvent('blConnected', { detail: { message: 'Bluet
 function App() {
     const [user, setUser] = useState(null)
     const [blConnected, setBlConnected] = useState(false)
+    const [checkTime, setCheckTime] = useState(1000)
 
     useEffect(() => {
         myEel.set_host("ws://localhost:8888");
 
-        const interval = setInterval(handleBl, 2000);
+        const interval = setInterval(handleBl, checkTime);
 
         window.addEventListener("unload", (event) => {
             myEel.sendClose()();
@@ -39,8 +40,10 @@ function App() {
         await myEel.get_socket_status()().then((r) => {
             if(blConnected && !r.connected){
                 setBlConnected(false);
+                setCheckTime(15000)
             }else if(!blConnected && r.connected){
                 setBlConnected(true);
+                setCheckTime(5000)
             }
 
             if(r.timedOut){

@@ -131,7 +131,7 @@ class SocketManager:
                 else:
                     self.__logger.print("SocketManager", 2, "Commande inconnue")
                     break
-                    
+
                 final = ""
 
 
