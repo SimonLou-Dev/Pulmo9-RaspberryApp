@@ -35,10 +35,12 @@ export const Login = (props) => {
         if(selectedDoctor === 0)  Object.assign(create_error, {doctor:["Veuillez choisir un médecin"]})
         await myEel.login(selectedDoctor)().then((r) => {
 
-            if(r){
+            if(r.logged){
                 navigate("/patients")
                 user.setUser({
-                    id: selectedDoctor,
+                    id: r.doctor[0],
+                    name: r.doctor[1],
+                    surname: r.doctor[2],
                 })
             }else{
                 Object.assign(create_error, {doctor:["Le médecin n'a pas été trouvé"]})
@@ -61,7 +63,7 @@ export const Login = (props) => {
                                 <select defaultValue={0} className={"form-input " + (error.doctor ? 'form-error': '')} value={selectedDoctor} onChange={(v) => selectDoctor(v.target.value)}>
                                     <option value={0} disabled={true}>Choisir un médecin</option>
                                     {doctors.map((item) =>
-                                        <option value={item[0]}>{item[1] + " " + item[2]}</option>
+                                        <option value={item[0]} key={item[0]}>{item[1] + " " + item[2]}</option>
                                     )}
                                 </select>
                                 {error.doctor && error.doctor.length > 0 &&

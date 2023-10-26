@@ -72,12 +72,12 @@ export const PatientEditor = (props) => {
 
         //Enregistrer le patient
         await myEel.create_patient( nom, prenom, dateNaissance, taille, poids, sexe, id)().then((result) => {
-
+            id = 0
             if(result && id !== 0){
                 console.log("Patient enregistré")
             }else if(id === 0){
+                console.log(result)
                 id = result[0]
-                console.log("Patient ajouté")
                 setReady(true)
             }
         })
@@ -90,32 +90,32 @@ export const PatientEditor = (props) => {
 
             <div className={"card"}>
                 <div className={"card-header"}>
-                    <h1>{ id === 0 ? "Ajouter" : "Modifier"} un patient</h1>
+                    <h2>{ id === 0 ? "Ajouter" : "Modifier"} un patient</h2>
                 </div>
                 <div className={"card-body flex-column"}>
                     <div className={"form-item flex-column"}>
                         <label>Nom</label>
-                        <input type={"text"} placeholder={"Saisir le nom du patient"} className={"form-input "} value={nom} onChange={(e) => setNom(e.target.value)}/>
+                        <input type={"text"} placeholder={"Saisir le nom du patient"} className={"form-item "} value={nom} onChange={(e) => setNom(e.target.value)}/>
                     </div>
                     <div className={"form-item flex-column"}>
                         <label>Prenom</label>
-                        <input type={"text"} placeholder={"Saisir le prénom du patient"} className={"form-input "} value={prenom} onChange={(e) => setPrenom(e.target.value)}/>
+                        <input type={"text"} placeholder={"Saisir le prénom du patient"} className={"form-item "} value={prenom} onChange={(e) => setPrenom(e.target.value)}/>
                     </div>
                     <div className={"form-item flex-column"}>
                         <label>Date de  naissance</label>
-                        <input type={"date"} placeholder={"JJ-MM-AAAA"} className={"form-input "} value={dateNaissance} onChange={(e) => setDateNaissance(e.target.value)}/>
+                        <input type={"date"} placeholder={"JJ-MM-AAAA"} className={"form-item "} value={dateNaissance} onChange={(e) => setDateNaissance(e.target.value)}/>
                     </div>
                     <div className={"form-item flex-column"}>
                         <label>Taille</label>
-                        <input type={"number"} placeholder={"En cm"} className={"form-input "} value={taille} onChange={(e) => setTaille(e.target.value)}/>
+                        <input type={"number"} placeholder={"En cm"} className={"form-item "} value={taille} onChange={(e) => setTaille(e.target.value)}/>
                     </div>
                     <div className={"form-item flex-column"}>
                         <label>Poids</label>
-                        <input type={"number"} placeholder={"en kg"} className={"form-input "} value={poids} onChange={(e) => setPoids(e.target.value)}/>
+                        <input type={"number"} placeholder={"en kg"} className={"form-item "} value={poids} onChange={(e) => setPoids(e.target.value)}/>
                     </div>
                     <div className={"form-item flex-column"}>
                         <label>Sexe</label>
-                        <select className={"form-input "} value={sexe} onChange={(e) => setSexe(e.target.value)}>
+                        <select className={"form-item "} value={sexe} onChange={(e) => setSexe(e.target.value)}>
                             <option value={3} disabled={true}>Choississez le sexe</option>
                             <option value={0}>Homme</option>
                             <option value={1}>Femme</option>

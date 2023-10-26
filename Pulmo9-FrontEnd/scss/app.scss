@@ -7,11 +7,11 @@
   border-radius: 10px;
 }
 *::-webkit-scrollbar-thumb {
-  background: $disabled;
+  background: $bg2var;
   border-radius: 10px;
 }
 *{
-  scrollbar-color: $disabled;
+  scrollbar-color: $bg2var;
   scrollbar-width: thin;
 }
 
@@ -87,5 +87,148 @@ body{
     width: 90%;
     margin: 20px auto 15px auto;
     border-top: 1px $boom solid;
+  }
+}
+
+.Layout{
+  width: 100vw;
+  height: 100vh;
+  .Header{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    background-color: $bg2var;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    .doctor_name{
+      width: 275px;
+      background-color: $bg2;
+      overflow: hidden;
+      button{
+        margin: auto 0;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        background-color: $bg1;
+        img{
+          width: 40px;
+          height: auto;
+        }
+      }
+      h3{
+        height: min-content;
+        margin: auto 0;
+        font-size: 20px;
+        text-wrap: none;
+        width: 175px;
+        text-overflow: ellipsis;
+      }
+    }
+    .menu{
+      width: 60%;
+      height: 100%;
+      overflow: hidden;
+      background-color: $bg2;
+      margin: 0 0 0 auto;
+      ul{
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        width: 100%;
+        height: 100%;
+
+        li{
+          text-align: center;
+          height: 100%;
+          list-style: none;
+          margin: auto 5% auto 5%;
+          width: 45%;
+          background-color: $bg1;
+          display: flex;
+          transition: all 300ms;
+          a{
+            margin: auto auto;
+            font-family: 'Baloo 2';
+            font-weight: 700;
+            font-size: 22px;
+            color: $heavytext;
+          }
+          &:hover{
+            background-color: $bg1var;
+          }
+        }
+      }
+    }
+
+  }
+
+  .Content{
+    padding-top: 70px;
+    display: flex;
+  }
+}
+
+/* Liste des patients */
+.PatientList{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  .table{
+    margin: auto auto;
+    .table-header{
+      button, a, input{
+        margin: auto 10px;
+      }
+    }
+    .table-content{
+      width: 100%;
+      display: flex;
+      table{
+        border-radius: 10px;
+        background-color: $bg1;
+        margin: 10px auto;
+      }
+    }
+
+  }
+
+}
+
+/* Fiche patient */
+.PatientEditor{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  .card{
+    width: 80%;
+    margin: auto auto;
+    background-color: $bg1;
+    padding: 10px;
+    border-radius: $border-radius;
+    max-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+
+    .card-header{
+      margin: 0 auto;
+      text-align: center;
+      width: 80%;
+      border-bottom: 1px $boom solid;
+
+    }
+    .card-body{
+      padding: 0 30px;
+      margin: 15px 0;
+    }
+    .card-footer{
+      button{
+        margin: auto 0;
+      }
+    }
   }
 }
