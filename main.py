@@ -4,6 +4,7 @@ from Utils.Logger import Logger
 from Utils.SocketManager import SocketManager
 from Utils.Controle_BdD import Controle_BdD
 from Models.Doctor import Doctor
+from Models.Patients import Patients
 
 
 running = True;
@@ -16,7 +17,7 @@ current_logged = None
 
 
 try:
-    bl_conn = SocketManager(eel,"local")
+    bl_conn = SocketManager(eel)
 except Exception as e:
     print(e)
     running = False
@@ -68,19 +69,38 @@ def add_doctor(prenom, nom):
 # login(id)
 @eel.expose
 def login(id):
-    if Doctor(database).find(id) != None:
+    doctor = Doctor(database).find(id)
+    if doctor != None:
         current_logged = id
-        return True
+        return {"logged": True, "doctor": doctor}
     else:
-        return False
+        return {"logged": False, "doctor": doctor}
 
 # logout(callback)
 
 #  get_patients(string search = "", int page = 0)
+@eel.expose
+def get_patients(search = "", page = 0):
+    return {
+        "patients": Patients(database).get_all_patients(page, search),
+        "pages": Patients(database).getNumberOfPages(search)
+    }
+
 
 # get_patient(int id)
+@eel.expose
+def get_patient(id):
+    return Patients(database).get_patient(id)
+
 
 # create_patient(string nom, string prenom, date DDN, float taille, float poid, int sexe = 0, int id = 0)
+@eel.expose
+def create_patient(nom, prenom, DDN, taille, poid, sexe = 0, id = 0):
+    if id == 0 or id == "0":
+        return Patients(database).add_patient(nom, prenom, DDN, taille, poid, sexe)
+    else:
+        Patients(database).update_patient(id, nom, prenom, DDN, taille, poid, sexe)
+        return True
 
 # list_mesure(int patient_id)
 

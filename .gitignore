@@ -17,8 +17,6 @@ dist
 dist-ssr
 *.local
 
-#Build
-web/assets
 
 # Editor directories and files
 .vscode/*
