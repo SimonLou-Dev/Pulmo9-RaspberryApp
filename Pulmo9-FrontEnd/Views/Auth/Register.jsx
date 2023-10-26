@@ -1,6 +1,7 @@
 import React, {useContext, useEffect} from 'react';
 import {Link, useNavigate} from "react-router-dom";
 import userContext from "../../components/Context/UserContext.jsx";
+import {myEel} from "../../MyEel.js";
 
 export const Register = (props) => {
     const user = useContext(userContext)
@@ -15,12 +16,19 @@ export const Register = (props) => {
         }
     }, []);
 
-    const register = () => {
+    const register = async () => {
         let create_error = {}
-        if(name.length < 2)  Object.assign(create_error, {name:["Le nom doit faire au moins 2 caractères"]})
-        if(surname.length < 2) Object.assign(create_error, {surname: ["Le prénom doit faire au moins 2 caractères"]})
+        if (name.length < 2) Object.assign(create_error, {name: ["Le nom doit faire au moins 2 caractères"]})
+        if (surname.length < 2) Object.assign(create_error, {surname: ["Le prénom doit faire au moins 2 caractères"]})
 
         setError(create_error)
+        if (create_error.length > 0) return;
+
+        await myEel.add_doctor(name, surname)().then((r) => {
+            if(r){
+                navigate("/login")
+            }
+        })
     }
 
     return (

@@ -2,6 +2,7 @@ import React, {useContext, useEffect} from 'react';
 import {Link, useNavigate} from "react-router-dom";
 import userContext from "../../components/Context/UserContext.jsx";
 import blImage from "../../assets/bluetooth.png";
+import {myEel} from "../../MyEel.js";
 
 
 export const Login = (props) => {
@@ -9,18 +10,42 @@ export const Login = (props) => {
     const navigate = useNavigate()
     const [selectedDoctor, selectDoctor] = React.useState(0)
     const [error, setError] = React.useState({})
+    const [doctors, setDoctors] = React.useState([])
 
 
     useEffect(() => {
         if(user.user !== null) {
             navigate("/patients")
         }
+
+        getDoctors()
+
+
     }, []);
 
+    const getDoctors = async () => {
+        await myEel.get_doctors()().then((r) => {
+            setDoctors(r)
+        })
+    }
 
-    const login = () => {
+
+    const login = async () => {
         let create_error = {}
         if(selectedDoctor === 0)  Object.assign(create_error, {doctor:["Veuillez choisir un médecin"]})
+        await myEel.login(selectedDoctor)().then((r) => {
+
+            if(r){
+                navigate("/patients")
+                user.setUser({
+                    id: selectedDoctor,
+                })
+            }else{
+                Object.assign(create_error, {doctor:["Le médecin n'a pas été trouvé"]})
+
+            }
+        })
+        setError(create_error)
     }
 
         return (
@@ -35,7 +60,9 @@ export const Login = (props) => {
                                 <label>Médecin</label>
                                 <select defaultValue={0} className={"form-input " + (error.doctor ? 'form-error': '')} value={selectedDoctor} onChange={(v) => selectDoctor(v.target.value)}>
                                     <option value={0} disabled={true}>Choisir un médecin</option>
-                                    <option>Sinon moi</option>
+                                    {doctors.map((item) =>
+                                        <option value={item[0]}>{item[1] + " " + item[2]}</option>
+                                    )}
                                 </select>
                                 {error.doctor && error.doctor.length > 0 &&
                                     <ul className={'error-list'}>

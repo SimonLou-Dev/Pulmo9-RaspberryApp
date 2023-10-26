@@ -3,11 +3,13 @@ import eel, threading, time, sys
 from Utils.Logger import Logger
 from Utils.SocketManager import SocketManager
 from Utils.Controle_BdD import Controle_BdD
+from Models.Doctor import Doctor
 
 
 running = True;
 eel_thread = None
 logger = Logger()
+current_logged = None
 
 
 
@@ -19,7 +21,8 @@ except Exception as e:
     print(e)
     running = False
     sys.exit()
-#database = Controle_BdD("database").getConnexion()
+
+database = Controle_BdD("database").getConnexion()
 
 #Creation de l'objet eel en mode wb et en authorisant les extensions .js et .html
 
@@ -46,12 +49,30 @@ def sendClose():
 
 
 # get_doctors(void)
+@eel.expose
+def get_doctors():
+    return Doctor(database).getAll()
 
 # remove_doctor(int id)
+@eel.expose
+def remove_doctor(id):
+    Doctor(database).delete(id)
+    return True
 
 # add_doctor(string prenom, string nom)
+@eel.expose
+def add_doctor(prenom, nom):
+    Doctor(database).add(prenom, nom)
+    return True
 
-# login(callBack)
+# login(id)
+@eel.expose
+def login(id):
+    if Doctor(database).find(id) != None:
+        current_logged = id
+        return True
+    else:
+        return False
 
 # logout(callback)
 
