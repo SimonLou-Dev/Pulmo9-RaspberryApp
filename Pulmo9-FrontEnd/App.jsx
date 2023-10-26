@@ -9,6 +9,7 @@ import {PatientList} from "./Views/Patient/PatientList.jsx";
 import {NoMatchRoute} from "./components/Utils/NoMatchRoute.jsx";
 import {WaitAuth} from "./Views/WaitAuth.jsx";
 import {myEel} from "./MyEel.js";
+import {PatientEditor} from "./Views/Patient/PatientEditor.jsx";
 
 
 /* Custom socket events */
@@ -64,6 +65,8 @@ function App() {
                     <Route index element={<WaitAuth/>} />
                     <Route path={"/"}  element={<Layout />}>
                         <Route path={"patients"} element={<PatientList/>}/>
+                        <Route path={"patient/:id"} element={<PatientEditor/>}/>
+                        <Route path={"*"} element={<NoMatchRoute/>}/>
 
                     </Route>
                 </Routes>
