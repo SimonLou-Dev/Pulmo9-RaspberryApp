@@ -10,6 +10,7 @@ import {NoMatchRoute} from "./components/Utils/NoMatchRoute.jsx";
 import {WaitAuth} from "./Views/WaitAuth.jsx";
 import {myEel} from "./MyEel.js";
 import {PatientEditor} from "./Views/Patient/PatientEditor.jsx";
+import {Calibration} from "./Views/Calibration/Calibration.jsx";
 
 
 /* Custom socket events */
@@ -66,6 +67,8 @@ function App() {
                     <Route path={"/"}  element={<Layout />}>
                         <Route path={"patients"} element={<PatientList/>}/>
                         <Route path={"patient/:id"} element={<PatientEditor/>}/>
+                        <Route path={"calibration"} element={<Calibration/>}/>
+
                         <Route path={"*"} element={<NoMatchRoute/>}/>
 
                     </Route>

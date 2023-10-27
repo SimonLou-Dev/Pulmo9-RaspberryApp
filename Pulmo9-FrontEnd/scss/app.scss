@@ -232,3 +232,96 @@ body{
     }
   }
 }
+
+.Calibration{
+  width: 100%;
+  height: calc(100vh - 60px);
+  display: flex;
+  .card {
+    max-width: 900px;
+    width: 90%;
+    margin: auto auto;
+    background-color: $bg1;
+    border-radius: $border-radius;
+    height: 90%;
+    max-height: 500px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    .card-infos{
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      padding: 15px 15px 0 15px;
+      overflow-y: auto;
+      width: 95%;
+      .card-infos-title {
+        h2 {
+          font-size: 26px;
+        }
+
+        text-align: center;
+        margin: 0 auto 15px auto;
+        border-bottom: 1px $boom solid;
+        width: 80%;
+
+      }
+
+
+
+        .card-infos-content-mode{
+          h3{
+            text-align: center;
+          }
+        }
+
+
+      .card-infos-content-calibration{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .btn-group{
+          margin: auto auto;
+          display: flex;
+          flex-direction: row;
+          width: 100%;
+          justify-content: space-evenly;
+        }
+
+      }
+    }
+    .avancement{
+      width: 5%;
+      min-width: 50px;
+      margin: 0 5px;
+      padding: 0 15px;
+      border-right: 1px $boom solid;
+      display: flex;
+      .avancement-status{
+        margin: auto auto;
+        display: flex;
+        flex-direction: column;
+        .avancement-status-point{
+          content: " ";
+          width: 4vw;
+          height: 4vw;
+          max-width: 30px;
+          max-height: 30px;
+          border-radius: 50%;
+          margin: 25px auto;
+          background-color: $red_light;
+          box-shadow: box_glow($red_light, 10px, 5px);
+        }
+        .active{
+          background-color: $green_light;
+          box-shadow: box_glow($green_light, 10px, 5px);
+        }
+        .passed{
+          background-color: $disabled;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+}

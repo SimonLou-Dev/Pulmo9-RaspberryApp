@@ -105,6 +105,16 @@ def create_patient(nom, prenom, DDN, taille, poid, sexe = 0, id = 0):
         Patients(database).update_patient(id, nom, prenom, DDN, taille, poid, sexe)
         return True
 
+@eel.expose
+def calibrate_pression(pression):
+    #TODO: Faire la calibration
+    return True
+
+@eel.expose
+def calibrate_pression_atm():
+    #TODO: Faire la calibration
+    return True
+
 # list_mesure(int patient_id)
 
 # start_mesure(int patient_id, int  frequency)
