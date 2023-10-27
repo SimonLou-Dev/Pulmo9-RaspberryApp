@@ -24,8 +24,6 @@ class SocketManager:
     running = True
     timedOut = False
 
-    __sendList = {}
-    __seqNumber = 0
     __threads = []
 
 
@@ -116,14 +114,11 @@ class SocketManager:
                 command = incomeJson["command"]
                 if command == "connection:ACK":
                     self.connIsOk = True
-                    self.__markMessageAsRecived(incomeJson)
                     self.__logger.print("SocketManager", 1, "Connexion confirmée")
                 elif command == "recive:ACK":
-                    self.__markMessageAsRecived(incomeJson)
                     break
                 elif command == "pong":
                     self.__logger.print("SocketManager", 1, "Appreil toujours connecté")
-                    self.__markMessageAsRecived(incomeJson)
                     self.__pingLaunched = False
                     self.connIsOk = True
                     self.timedOut = False
@@ -135,14 +130,8 @@ class SocketManager:
                 final = ""
 
 
-    def __markMessageAsRecived(self, message):
-        seq = message["seqNumber"]
-        self.__sendList.pop(seq)
 
     def __sendMessage(self, message):
-        message["seqNumber"] = self.__seqNumber
-        self.__sendList[self.__seqNumber] = message
-        self.__seqNumber += 1
         jsonStr = json.dumps(message)
         self.currentSocket.send(jsonStr.encode())
 

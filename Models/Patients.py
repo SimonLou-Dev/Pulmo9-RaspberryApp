@@ -8,8 +8,19 @@ class Patients(Model):
         self.__c = db
 
     def get_all_patients(self, page, search):
-        res = self.__c.execute("SELECT * FROM patients WHERE nom LIKE '%" + search + "%' OR prenom LIKE '%" + search + "%' LIMIT 15 OFFSET " + str(page * 15))
-        return res.fecthall()
+        pages = self.getNumberOfPages(search)
+
+        if pages == 0:
+            return {
+                "patients": [],
+                "pages": 0
+            }
+
+        res = self.__c.execute("SELECT * FROM patients WHERE nom LIKE '%" + search + "%' OR prenom LIKE '%" + search + "%' LIMIT 5 OFFSET " + str((int(page)-1) * 5))
+        return {
+            "patients": res.fetchall(),
+            "pages": pages
+        }
 
     def get_patient(self, id):
         res = self.__c.execute("SELECT * FROM patients WHERE id = ?", (id,))
@@ -22,3 +33,7 @@ class Patients(Model):
     def update_patient(self, id, nom, prenom, date_naissance, poids, taille, sexe):
         self.__c.execute("UPDATE patients SET nom = ?, prenom = ?, date_naissance = ?, poids = ?, taille = ?, sexe = ? WHERE id = ?", (nom, prenom, date_naissance, poids, taille, sexe, id))
         self.__c.commit()
+
+    def getNumberOfPages(self, search):
+        res = self.__c.execute("SELECT COUNT(*) FROM patients WHERE nom LIKE '%" + search + "%' OR prenom LIKE '%" + search + "%'")
+        return int(res.fetchone()[0] / 5)

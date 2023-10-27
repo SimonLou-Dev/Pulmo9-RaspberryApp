@@ -17,7 +17,13 @@ current_logged = None
 
 
 try:
-    bl_conn = SocketManager(eel)
+
+
+    if len(sys.argv) > 1 and sys.argv[1] == "--dev":
+        bl_conn = SocketManager(eel, "local")
+    else:
+        bl_conn = SocketManager(eel)
+
 except Exception as e:
     print(e)
     running = False
@@ -81,10 +87,7 @@ def login(id):
 #  get_patients(string search = "", int page = 0)
 @eel.expose
 def get_patients(search = "", page = 0):
-    return {
-        "patients": Patients(database).get_all_patients(page, search),
-        "pages": Patients(database).getNumberOfPages(search)
-    }
+    return Patients(database).get_all_patients(page, search)
 
 
 # get_patient(int id)

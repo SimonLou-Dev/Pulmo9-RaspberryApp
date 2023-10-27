@@ -60,7 +60,7 @@ export const Login = (props) => {
                         <div className={"form --all-sized flex-column"}>
                             <div className={"form-item flex-column"}>
                                 <label>Médecin</label>
-                                <select defaultValue={0} className={"form-input " + (error.doctor ? 'form-error': '')} value={selectedDoctor} onChange={(v) => selectDoctor(v.target.value)}>
+                                <select className={"form-input " + (error.doctor ? 'form-error': '')} value={selectedDoctor} onChange={(v) => selectDoctor(v.target.value)}>
                                     <option value={0} disabled={true}>Choisir un médecin</option>
                                     {doctors.map((item) =>
                                         <option value={item[0]} key={item[0]}>{item[1] + " " + item[2]}</option>

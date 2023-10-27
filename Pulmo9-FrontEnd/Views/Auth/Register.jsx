@@ -40,17 +40,6 @@ export const Register = (props) => {
                 <div className={"auth-card-body flex-row-evenly "}>
                     <div className={"form --all-sized flex-column "}>
                         <div className={"form-item flex-column"}>
-                            <label>Nom</label>
-                            <input type={"text"} placeholder={"Saisir votre nom"} className={"form-item " + (error.name ? 'form-error': '')} value={name} onChange={(v) => setName(v.target.value)}/>
-                            {error.name && error.name.length > 0 &&
-                                <ul className={'error-list'}>
-                                    {error.name && error.name.map((item)=>
-                                        <li>{item}</li>
-                                    )}
-                                </ul>
-                            }
-                        </div>
-                        <div className={"form-item flex-column"}>
                             <label>Prénom</label>
                             <input type={"text"} placeholder={"Saisir votre prénom"} className={"form-item " + (error.surname ? 'form-error': '')} value={surname} onChange={(v) => setSurname(v.target.value)}/>
                             {error.surname && error.surname.length > 0 &&
@@ -61,6 +50,17 @@ export const Register = (props) => {
                                 </ul>
                             }
                         </div>
+                    </div>
+                    <div className={"form-item flex-column"}>
+                        <label>Nom</label>
+                        <input type={"text"} placeholder={"Saisir votre nom"} className={"form-item " + (error.name ? 'form-error': '')} value={name} onChange={(v) => setName(v.target.value)}/>
+                        {error.name && error.name.length > 0 &&
+                            <ul className={'error-list'}>
+                                {error.name && error.name.map((item)=>
+                                    <li>{item}</li>
+                                )}
+                            </ul>
+                        }
                     </div>
                 </div>
                 <div className={"auth-card-footer flex-row-evenly"}>

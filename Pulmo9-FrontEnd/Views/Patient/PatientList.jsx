@@ -28,11 +28,15 @@ export const PatientList = (props) => {
 
         await myEel.get_patients(_search, _page)().then((result) => {
             setPatients(result.patients)
+            console.log(result)
+
+
             setPagination({
 
                 next_page: (result.pages === _page) ? null : _page + 1,
                 prev_page: (_page === 1) ? null : _page - 1,
             })
+            if(result.patients.length === 0) setPagination({next_page: null, prev_page: null});
         });
     }
 

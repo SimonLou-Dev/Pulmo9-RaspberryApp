@@ -53,11 +53,11 @@ export const PatientEditor = (props) => {
             Object.assign(_errors, {dateNaissance: ["La date de naissance est obligatoire"]})
         }
 
-        if(taille.length === ""){
+        if(taille.length === 0){
             Object.assign(_errors, {taille: ["La taille est obligatoire"]})
         }
 
-        if(poids.length === ""){
+        if(poids.length === 0){
             Object.assign(_errors, {poids: ["Le poids est obligatoire"]})
         }
 
@@ -94,33 +94,75 @@ export const PatientEditor = (props) => {
                 </div>
                 <div className={"card-body flex-column"}>
                     <div className={"form-item flex-column"}>
-                        <label>Nom</label>
-                        <input type={"text"} placeholder={"Saisir le nom du patient"} className={"form-item "} value={nom} onChange={(e) => setNom(e.target.value)}/>
-                    </div>
-                    <div className={"form-item flex-column"}>
                         <label>Prenom</label>
-                        <input type={"text"} placeholder={"Saisir le prénom du patient"} className={"form-item "} value={prenom} onChange={(e) => setPrenom(e.target.value)}/>
+                        <input type={"text"} placeholder={"Saisir le prénom du patient"} className={"form-item " + (errors.prenom ? 'form-error': '')} value={prenom} onChange={(e) => setPrenom(e.target.value)}/>
                     </div>
+                    {errors.prenom && errors.prenom.length > 0 &&
+                        <ul className={'error-list'}>
+                            {errors.prenom && errors.prenom.map((item)=>
+                                <li>{item}</li>
+                            )}
+                        </ul>
+                    }
+                    <div className={"form-item flex-column"}>
+                        <label>Nom</label>
+                        <input type={"text"} placeholder={"Saisir le nom du patient"} className={"form-item "+ (errors.nom ? 'form-error': '')} value={nom} onChange={(e) => setNom(e.target.value)}/>
+                    </div>
+                    {errors.nom && errors.nom.length > 0 &&
+                        <ul className={'error-list'}>
+                            {errors.nom && errors.nom.map((item)=>
+                                <li>{item}</li>
+                            )}
+                        </ul>
+                    }
                     <div className={"form-item flex-column"}>
                         <label>Date de  naissance</label>
-                        <input type={"date"} placeholder={"JJ-MM-AAAA"} className={"form-item "} value={dateNaissance} onChange={(e) => setDateNaissance(e.target.value)}/>
+                        <input type={"date"} placeholder={"JJ-MM-AAAA"} className={"form-item " + (errors.dateNaissance ? 'form-error': '')} value={dateNaissance} onChange={(e) => setDateNaissance(e.target.value)}/>
                     </div>
+                    {errors.dateNaissance && errors.dateNaissance.length > 0 &&
+                        <ul className={'error-list'}>
+                            {errors.dateNaissance && errors.dateNaissance.map((item)=>
+                                <li>{item}</li>
+                            )}
+                        </ul>
+                    }
                     <div className={"form-item flex-column"}>
                         <label>Taille</label>
-                        <input type={"number"} placeholder={"En cm"} className={"form-item "} value={taille} onChange={(e) => setTaille(e.target.value)}/>
+                        <input type={"number"} placeholder={"En cm"} className={"form-item " + (errors.taille ? 'form-error': '')} value={taille} onChange={(e) => setTaille(e.target.value)}/>
                     </div>
+                    {errors.taille && errors.taille.length > 0 &&
+                        <ul className={'error-list'}>
+                            {errors.taille && errors.taille.map((item)=>
+                                <li>{item}</li>
+                            )}
+                        </ul>
+                    }
                     <div className={"form-item flex-column"}>
                         <label>Poids</label>
-                        <input type={"number"} placeholder={"en kg"} className={"form-item "} value={poids} onChange={(e) => setPoids(e.target.value)}/>
+                        <input type={"number"} placeholder={"en kg"} className={"form-item " + (errors.poids ? 'form-error': '')} value={poids} onChange={(e) => setPoids(e.target.value)}/>
                     </div>
+                    {errors.poids && errors.poids.length > 0 &&
+                        <ul className={'error-list'}>
+                            {errors.poids && errors.poids.map((item)=>
+                                <li>{item}</li>
+                            )}
+                        </ul>
+                    }
                     <div className={"form-item flex-column"}>
                         <label>Sexe</label>
-                        <select className={"form-item "} value={sexe} onChange={(e) => setSexe(e.target.value)}>
+                        <select className={"form-item " + (errors.sexe ? 'form-error': '')} value={sexe} onChange={(e) => setSexe(e.target.value)}>
                             <option value={3} disabled={true}>Choississez le sexe</option>
                             <option value={0}>Homme</option>
                             <option value={1}>Femme</option>
                         </select>
                     </div>
+                    {errors.sexe && errors.sexe.length > 0 &&
+                        <ul className={'error-list'}>
+                            {errors.sexe && errors.sexe.map((item)=>
+                                <li>{item}</li>
+                            )}
+                        </ul>
+                    }
 
                 </div>
                 <div className={"card-footer flex-row-evenly"}>
