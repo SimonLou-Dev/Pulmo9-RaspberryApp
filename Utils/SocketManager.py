@@ -5,6 +5,7 @@ import subprocess
 import threading
 import time
 from Utils.Logger import Logger
+from Models.Mesures import Mesures
 
 
 bl = False
@@ -93,6 +94,9 @@ class SocketManager:
     def __listener(self):
         self.__logger.print("SocketManager", 1, "Ecoute des messages arrivants")
         final = ""
+        currentDebit = {}
+        currentPression = {}
+        dataLenght = 0;
         while self.running:
             print("Current status "  + self.running.__str__())
             try:
@@ -123,6 +127,22 @@ class SocketManager:
                     self.connIsOk = True
                     self.timedOut = False
                     #Mettre à  jour l'interface en connecté
+                elif command == "sendData":
+                    mesureID = incomeJson["mesure_id"]
+                    data = incomeJson["data"]
+                    for i in range(0, len(data)):
+                        debit = data[i]["debit"]
+                        pression = data[i]["pression"]
+                        if debit >= -0.0001 and debit <= 0.0001:
+                            debit = data[i]["debit"] = 0
+                        currentDebit.update({dataLenght: round(debit,4)})
+                        if pression >= -0.0001 and pression <= 0.0001:
+                            pression = data[i]["debit"] = 0
+                        currentPression.update({dataLenght: round(pression,4)})
+                        dataLenght += 1
+
+                    print("Debit " + currentDebit.__str__() + " pression " + currentPression.__str__())
+                    #Mesures.save_mesure_points(mesureID, currentDebit, currentPression)
                 else:
                     self.__logger.print("SocketManager", 2, "Commande inconnue")
                     break
