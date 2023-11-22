@@ -10,8 +10,8 @@ class Controle_BdD:
     def verifier_tables(self):
         self.__c.execute('''CREATE TABLE IF NOT EXISTS medecins (ID INTEGER PRIMARY KEY AUTOINCREMENT, nom text, prenom text, deleted INT DEFAULT 0)''')
         self.__c.execute('''CREATE TABLE IF NOT EXISTS patients (ID INTEGER PRIMARY KEY AUTOINCREMENT, nom text, prenom text, sexe text, date_naissance text, taille INT, poids INT)''')
-        self.__c.execute('''CREATE TABLE IF NOT EXISTS mesures (ID INTEGER PRIMARY KEY AUTOINCREMENT, frequence INT, doctor_id INT, date_mesure text, patient_ID INT, pression_atm FLOAT)''')
-        self.__c.execute('''CREATE TABLE IF NOT EXISTS mesures_details (ID INTEGER PRIMARY KEY AUTOINCREMENT, mesure_id INT, pression FLOAT, debit FlOAT)''')
+        self.__c.execute('''CREATE TABLE IF NOT EXISTS mesures (ID INTEGER PRIMARY KEY AUTOINCREMENT, frequence INT, doctor_id INT, date_mesure text, patient_ID INT, RESULT FLOAT NULLABLE DEFAULT NULL, running BOOLEAN DEFAULT 0)''')
+        self.__c.execute('''CREATE TABLE IF NOT EXISTS mesures_details (ID INTEGER PRIMARY KEY AUTOINCREMENT, mesure_id INT, pression VARCHAR, debit VARCHAR)''')
         return True
 
 
