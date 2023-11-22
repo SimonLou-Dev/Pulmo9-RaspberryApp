@@ -21,6 +21,8 @@ class SocketManager:
     socketType = ""
     currentSocket = None
 
+    __database = None
+
     connIsOk = False
     running = True
     timedOut = False
@@ -36,7 +38,8 @@ class SocketManager:
     __pingLaunchedTime = time.time()
 
     #Constructeur de la classe, BT par défaut pour une connexion bluetooth et local pour le dévellopement
-    def __init__(self, main, _socketType = "bt"):
+    def __init__(self, main, _db, _socketType = "bt"):
+        self.__database = _db
         self.__main = main
         if not bl and _socketType == "bt":
             raise Exception("Impossible d'établir une conenxtion avec le bluetooth")
@@ -134,15 +137,15 @@ class SocketManager:
                         debit = data[i]["debit"]
                         pression = data[i]["pression"]
                         if debit >= -0.0001 and debit <= 0.0001:
-                            debit = data[i]["debit"] = 0
+                            debit = 0
                         currentDebit.update({dataLenght: round(debit,4)})
                         if pression >= -0.0001 and pression <= 0.0001:
-                            pression = data[i]["debit"] = 0
+                            pression = 0
                         currentPression.update({dataLenght: round(pression,4)})
                         dataLenght += 1
 
                     print("Debit " + currentDebit.__str__() + " pression " + currentPression.__str__())
-                    #Mesures.save_mesure_points(mesureID, currentDebit, currentPression)
+                    Mesures(self.__database).save_mesure_points(mesureID, currentDebit, currentPression)
                 else:
                     self.__logger.print("SocketManager", 2, "Commande inconnue")
                     break

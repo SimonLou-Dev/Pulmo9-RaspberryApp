@@ -45,5 +45,5 @@ class Mesures(Model):
         self.__c.commit()
 
     def get_mesure_points(self, mesure_id):
-        res = self.__c.execute("SELECT * FROM mesures_details WHERE mesure_id = ?", (mesure_id,))
+        res = self.__c.execute("SELECT debit, pression FROM mesures_details WHERE mesure_id = ?", (mesure_id,))
         return res.fetchone()

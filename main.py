@@ -14,24 +14,20 @@ eel_thread = None
 logger = Logger()
 current_logged = None
 
-
-
-
+database = Controle_BdD("database").getConnexion()
 
 try:
 
 
     if len(sys.argv) > 1 and sys.argv[1] == "--dev":
-        bl_conn = SocketManager(eel, "local")
+        bl_conn = SocketManager(eel, database, "local")
     else:
-        bl_conn = SocketManager(eel)
+        bl_conn = SocketManager(eel, database)
 
 except Exception as e:
     print(e)
     running = False
     sys.exit()
-
-database = Controle_BdD("database").getConnexion()
 
 #Creation de l'objet eel en mode wb et en authorisant les extensions .js et .html
 
@@ -122,14 +118,23 @@ def calibrate_pression_atm():
 @eel.expose
 def list_mesure(patient_id, page):
     return Mesures(database).get_patient_mesures(patient_id, page)
-# start_mesure(int patient_id, int  frequency)
+
+# create_mesure(int patient_id, int  frequency)
 @eel.expose
-def start_mesure(patient_id, frequency):
+def create_mesure(patient_id, frequency):
     return Mesures(database).create_mesure(frequency, current_logged, time.time(), patient_id)
+
+# start_mesure(int mesure_id)
+
+# init_mesure(int mesure_id)
 
 # stop_mesure(int mesure_id)
 
 # update_current_mesure(int mesure_id)
+@eel.expose
+def update_current_mesure(mesure_id):
+    return Mesures(database).get_mesure_points(mesure_id)
+
 
 # calibrate(int pression, int debit)
 
