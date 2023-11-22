@@ -72,6 +72,7 @@ export const PatientEditor = (props) => {
 
         //Enregistrer le patient
         await myEel.create_patient( nom, prenom, dateNaissance, taille, poids, sexe, id)().then((result) => {
+            console.log(result)
             id = 0
             if(result && id !== 0){
                 console.log("Patient enregistré")

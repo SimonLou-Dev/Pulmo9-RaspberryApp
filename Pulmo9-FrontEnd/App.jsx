@@ -11,6 +11,9 @@ import {WaitAuth} from "./Views/WaitAuth.jsx";
 import {myEel} from "./MyEel.js";
 import {PatientEditor} from "./Views/Patient/PatientEditor.jsx";
 import {Calibration} from "./Views/Calibration/Calibration.jsx";
+import {MesureList} from "./Views/Mesure/MesureList.jsx";
+import {MesurePrepare} from "./Views/Mesure/MesurePrepare.jsx";
+import {MesureData} from "./Views/Mesure/MesureData.jsx";
 
 
 /* Custom socket events */
@@ -68,6 +71,9 @@ function App() {
                         <Route path={"patients"} element={<PatientList/>}/>
                         <Route path={"patient/:id"} element={<PatientEditor/>}/>
                         <Route path={"calibration"} element={<Calibration/>}/>
+                        <Route path={"patient/:id/mesures"} element={<MesureList/>}/>
+                        <Route path={"patient/:id/mesure/:idmesure"} element={<MesurePrepare/>}/>
+                        <Route path={"mesure/:id"} element={<MesureData/>}/>
 
                         <Route path={"*"} element={<NoMatchRoute/>}/>
 

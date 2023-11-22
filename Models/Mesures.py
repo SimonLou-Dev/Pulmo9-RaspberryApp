@@ -1,5 +1,5 @@
 from Models.Model import Model
-import json
+import json, math
 
 class Mesures(Model):
     __c = None
@@ -8,19 +8,32 @@ class Mesures(Model):
         self.__c = db
 
 
-    def get_patient_mesures(self, patient_id):
-        res = self.__c.execute("SELECT * FROM mesures WHERE patient_ID = ?", (patient_id,))
-        return res.fetchall()
+    def get_patient_mesures(self, patient_id, page = 0):
+        MaxPages = self.__get_mesures_pages(patient_id)
+        if MaxPages == 0:
+            return {
+                "mesures": [],
+                "pages": 0
+            }
+
+        res = self.__c.execute("SELECT * FROM mesures WHERE patient_ID =" + patient_id +" ORDER BY date_mesure DESC LIMIT 5 OFFSET " + str((int(page)-1) * 5))
+        return {
+            "mesures": res.fetchall(),
+            "pages": MaxPages
+        }
+
+    def __get_mesures_pages(self, patient_id):
+        res = self.__c.execute("SELECT COUNT(*) FROM mesures WHERE patient_ID = " + patient_id)
+        return math.ceil(res.fetchone()[0] / 5)
 
     def get_mesure(self, mesure_id):
         res = self.__c.execute("SELECT * FROM mesures WHERE ID = ?", (mesure_id,))
         return res.fetchone()
 
     def create_mesure(self, frequence, doctor_id, date_mesure, patient_ID):
-        self.__c.execute("INSERT INTO mesures (frequence, doctor_id, date_mesure, patient_ID, pression_atm, running) VALUES (?, ?, ?, ?, ?, true)", (frequence, doctor_id, date_mesure, patient_ID))
+        self.__c.execute("INSERT INTO mesures (frequence, doctor_id, date_mesure, patient_ID, pression_atm) VALUES (?, ?, ?, ?, ?, true)", (frequence, doctor_id, date_mesure, patient_ID))
         self.__c.commit()
-
-        #TODO return id
+        return self.get_mesure(self.getLastInsertId())
 
 
     def start_save_mesure(self, mesure_id):

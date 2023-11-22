@@ -1,5 +1,5 @@
 from Models.Model import Model
-import json
+import json, math
 
 class Patients(Model):
     __c = None
@@ -7,7 +7,13 @@ class Patients(Model):
     def __init__(self, db):
         self.__c = db
 
+
+
     def get_all_patients(self, page, search):
+
+
+
+
         pages = self.getNumberOfPages(search)
 
         if pages == 0:
@@ -16,7 +22,7 @@ class Patients(Model):
                 "pages": 0
             }
 
-        res = self.__c.execute("SELECT * FROM patients WHERE nom LIKE '%" + search + "%' OR prenom LIKE '%" + search + "%' LIMIT 5 OFFSET " + str((int(page)-1) * 5))
+        res = self.__c.execute("SELECT id, prenom, nom, date_naissance, sexe FROM patients WHERE nom LIKE '%" + search + "%' OR prenom LIKE '%" + search + "%' OR date_naissance LIKE '%" + search + "%'  LIMIT 5 OFFSET " + str((int(page)-1) * 5))
         return {
             "patients": res.fetchall(),
             "pages": pages
@@ -29,11 +35,14 @@ class Patients(Model):
     def add_patient(self, nom, prenom, date_naissance, poids, taille, sexe):
         self.__c.execute("INSERT INTO patients (nom, prenom, date_naissance, poids, taille, sexe) VALUES (?, ?, ?, ?, ?, ?)", (nom, prenom, date_naissance, poids, taille, sexe))
         self.__c.commit()
+        return self.get_patient(self.getLastInsertId())
+
 
     def update_patient(self, id, nom, prenom, date_naissance, poids, taille, sexe):
         self.__c.execute("UPDATE patients SET nom = ?, prenom = ?, date_naissance = ?, poids = ?, taille = ?, sexe = ? WHERE id = ?", (nom, prenom, date_naissance, poids, taille, sexe, id))
         self.__c.commit()
+        return self.get_patient(id)
 
     def getNumberOfPages(self, search):
-        res = self.__c.execute("SELECT COUNT(*) FROM patients WHERE nom LIKE '%" + search + "%' OR prenom LIKE '%" + search + "%'")
-        return int(res.fetchone()[0] / 5)
+        res = self.__c.execute("SELECT COUNT(*) FROM patients WHERE nom LIKE '%" + search + "%' OR prenom LIKE '%" + search + "%' OR date_naissance LIKE '%" + search + "%'")
+        return math.ceil(res.fetchone()[0] / 5)

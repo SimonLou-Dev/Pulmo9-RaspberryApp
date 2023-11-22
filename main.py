@@ -5,6 +5,8 @@ from Utils.SocketManager import SocketManager
 from Utils.Controle_BdD import Controle_BdD
 from Models.Doctor import Doctor
 from Models.Patients import Patients
+from Models.Mesures import Mesures
+
 
 
 running = True;
@@ -115,9 +117,15 @@ def calibrate_pression_atm():
     #TODO: Faire la calibration
     return True
 
-# list_mesure(int patient_id)
 
+# list_mesure(int patient_id)
+@eel.expose
+def list_mesure(patient_id, page):
+    return Mesures(database).get_patient_mesures(patient_id, page)
 # start_mesure(int patient_id, int  frequency)
+@eel.expose
+def start_mesure(patient_id, frequency):
+    return Mesures(database).create_mesure(frequency, current_logged, time.time(), patient_id)
 
 # stop_mesure(int mesure_id)
 

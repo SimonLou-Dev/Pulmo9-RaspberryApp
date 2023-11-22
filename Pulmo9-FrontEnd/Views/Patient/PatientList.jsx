@@ -23,12 +23,29 @@ export const PatientList = (props) => {
         if (_page === undefined) _page = page;
         if (_search === undefined) _search = search;
 
+
+
         setPage(_page);
         setSearch(_search);
 
+        if (_search.includes("/")){
+            _search = _search.replaceAll("/", "-")
+            let date  = _search.split("-");
+            if(date.length == 1){
+                _search = date[0]
+            }
+            else if(date.length == 2){
+                _search = date[1] + "-" + date[0]
+            }
+            else if(date.length == 3){
+                _search = date[2] + "-" + date[1] + "-" + date[0]
+            }
+
+        }
+
+
         await myEel.get_patients(_search, _page)().then((result) => {
             setPatients(result.patients)
-            console.log(result)
 
 
             setPagination({
