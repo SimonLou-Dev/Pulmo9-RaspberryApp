@@ -6,9 +6,12 @@ export const MesurePrepare = (props) => {
     const [errors, setErrors] = React.useState([])
     const [frequency, setFrequency] = React.useState(0)
     const [ready, setReady] = React.useState(false)
+    let {mesureIdUrl} = useParams("idmesure")
+
+    const [mesureId, setMesureId] = React.useState(mesureIdUrl)
 
     let {id} = useParams("id")
-    let {mesureId} = useParams("idmesure")
+
 
     useEffect(() => {
         if(mesureId != 0 ){
@@ -20,11 +23,17 @@ export const MesurePrepare = (props) => {
 
 
     const save = async () => {
+        if(frequency == 0){
+            setErrors({freq: ["Veuillez choisir une fréquence"]})
+            return;
+        }else{
+            setErrors({})
+        }
+
+
         await myEel.create_mesure(id, frequency)().then((r) => {
-            console.log(r)
-
-
-
+            setMesureId(r[0])
+            setReady(true)
         });
     }
 
@@ -41,7 +50,7 @@ export const MesurePrepare = (props) => {
 
                     <div className={"form-item flex-column"}>
                         <label>Fréquence</label>
-                        <select className={"form-item " + (errors.sexe ? 'form-error': '')} value={frequency} onChange={(e) => setFrequency(e.target.value)}>
+                        <select className={"form-item " + (errors.freq ? 'form-error': '')} value={frequency} onChange={(e) => setFrequency(e.target.value)}>
                             <option value={0} disabled={true}>Choississez la fréquence</option>
                             <option value={4}>4 Hz</option>
                             <option value={8}>8 Hz</option>
@@ -51,9 +60,9 @@ export const MesurePrepare = (props) => {
 
                         </select>
                     </div>
-                    {errors.sexe && errors.sexe.length > 0 &&
+                    {errors.freq && errors.freq.length > 0 &&
                         <ul className={'error-list'}>
-                            {errors.sexe && errors.sexe.map((item)=>
+                            {errors.freq && errors.freq.map((item)=>
                                 <li>{item}</li>
                             )}
                         </ul>
@@ -63,7 +72,7 @@ export const MesurePrepare = (props) => {
                 <div className={"card-footer flex-row-evenly"}>
                     <Link className={"btn "} to={"/patients"}>Retour</Link>
                     <button className={"btn "} onClick={save}>Enregistrer</button>
-                    <Link className={"btn " + (ready? "" : "disabled")} to={(ready? "mesure/:id" : "")}>continuer</Link>
+                    <Link className={"btn " + (ready? "" : "disabled")} to={(ready? "/mesure/" + mesureId : "")}>continuer</Link>
                 </div>
             </div>
 

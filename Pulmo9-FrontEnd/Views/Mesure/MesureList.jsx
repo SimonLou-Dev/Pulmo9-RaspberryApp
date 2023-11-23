@@ -61,10 +61,11 @@ export const MesureList = (props) => {
                         {mesures && mesures.map((mesure)=>
                             <tr key={mesure[0]} >
                                 <td>{mesure[0]}</td>
-                                <td>{mesure[2] + " " + mesure[1]}</td>
+                                <td>{mesure[1]}</td>
                                 <td>{dateFormat(mesure[3], 'dd/mm/yyyy')}</td>
-                                <td >{mesure[4]  === "0" ? "Homme":"femme"} </td>
-                                <td><Link to={"/patient/" + mesure[0]}><img src={'../../assets/icons/editer.png'} alt={''}/></Link> </td>
+                                <td > dr moi </td>
+                                <td>{mesure[5] == null ? "mesure non terminée" : mesure[5] + "Ohm"}</td>
+                                <td><Link to={"/mesure/" + mesure[0]}><img src={'../../assets/icons/editer.png'} alt={''}/></Link> </td>
                             </tr>
                         )}
 
@@ -75,3 +76,15 @@ export const MesureList = (props) => {
         </div>
     )
 }
+
+/*
+0 ID
+1 Frequency
+2 -> Doctor
+3 date
+4 - patient ID
+5 - Result
+6 - Ended
+
+
+ */

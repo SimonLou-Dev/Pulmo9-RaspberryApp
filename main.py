@@ -1,4 +1,4 @@
-import eel, threading, time, sys
+import eel, threading, time, sys, datetime
 
 from Utils.Logger import Logger
 from Utils.SocketManager import SocketManager
@@ -122,7 +122,8 @@ def list_mesure(patient_id, page):
 # create_mesure(int patient_id, int  frequency)
 @eel.expose
 def create_mesure(patient_id, frequency):
-    return Mesures(database).create_mesure(frequency, current_logged, time.time(), patient_id)
+    currentDateTime = datetime.datetime.now()
+    return Mesures(database).create_mesure(frequency, current_logged, currentDateTime, patient_id)
 
 # start_mesure(int mesure_id)
 
@@ -132,7 +133,7 @@ def create_mesure(patient_id, frequency):
 
 # update_current_mesure(int mesure_id)
 @eel.expose
-def update_current_mesure(mesure_id):
+def get_mesure_points(mesure_id):
     return Mesures(database).get_mesure_points(mesure_id)
 
 

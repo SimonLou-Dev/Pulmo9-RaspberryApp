@@ -325,3 +325,34 @@ body{
     }
   }
 }
+
+.MesureData{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  .mesure-container{
+    width: 80%;
+    margin: auto auto;
+    background-color: $bg1;
+    padding: 10px;
+    border-radius: $border-radius;
+    max-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+
+    .mesure-container-title{
+      margin: 0 auto;
+      text-align: center;
+      width: 80%;
+      border-bottom: 1px $boom solid;
+
+    }
+    .mesure-container-charts{
+      width: 100%;
+    }
+    .mesure-container-footer{
+
+    }
+  }
+}
