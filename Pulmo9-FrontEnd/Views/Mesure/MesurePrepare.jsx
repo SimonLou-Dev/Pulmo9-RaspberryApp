@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import {Link, useParams} from "react-router-dom";
+import {myEel} from "../../MyEel.js";
 
 export const MesurePrepare = (props) => {
     const [errors, setErrors] = React.useState([])
@@ -16,8 +17,15 @@ export const MesurePrepare = (props) => {
 
     }, []);
 
-    const save = async () => {
 
+
+    const save = async () => {
+        await myEel.create_mesure(id, frequency)().then((r) => {
+            console.log(r)
+
+
+
+        });
     }
 
 

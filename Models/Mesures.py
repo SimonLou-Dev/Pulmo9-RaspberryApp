@@ -31,7 +31,7 @@ class Mesures(Model):
         return res.fetchone()
 
     def create_mesure(self, frequence, doctor_id, date_mesure, patient_ID):
-        self.__c.execute("INSERT INTO mesures (frequence, doctor_id, date_mesure, patient_ID, pression_atm) VALUES (?, ?, ?, ?, ?, true)", (frequence, doctor_id, date_mesure, patient_ID))
+        self.__c.execute("INSERT INTO mesures (frequence, doctor_id, date_mesure, patient_ID) VALUES (?, ?, ?, ?)", (frequence, doctor_id, date_mesure, patient_ID))
         self.__c.commit()
         return self.get_mesure(self.getLastInsertId())
 
