@@ -5,6 +5,8 @@ import {PageNavigator} from "../../components/Table/PageNavigator.jsx";
 import dateFormat from "dateformat";
 import {Link} from "react-router-dom";
 import {myEel} from "../../MyEel.js";
+import edit from '../../assets/icons/editer.png';
+
 
 export const PatientList = (props) => {
     const [search, setSearch] = React.useState('');
@@ -85,7 +87,7 @@ export const PatientList = (props) => {
                                 <td>{patient[2] + " " + patient[1]}</td>
                                 <td>{dateFormat(patient[3], 'dd/mm/yyyy')}</td>
                                 <td >{patient[4]  === "0" ? "Homme":"femme"} </td>
-                                <td><Link to={"/patient/" + patient[0]}><img src={'../../assets/icons/editer.png'} alt={''}/></Link> </td>
+                                <td><Link to={"/patient/" + patient[0]}><img src={edit} alt={''}/></Link> </td>
                             </tr>
                         )}
 

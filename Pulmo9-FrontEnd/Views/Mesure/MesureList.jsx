@@ -1,10 +1,10 @@
 import React from 'react';
 import {Link, useParams} from "react-router-dom";
-import {Searcher} from "../../components/Table/Searcher.jsx";
 import {UpdaterBtn} from "../../components/Table/UpdaterBtn.jsx";
 import {PageNavigator} from "../../components/Table/PageNavigator.jsx";
 import dateFormat from "dateformat";
 import {myEel} from "../../MyEel.js";
+import edit from '../../assets/icons/editer.png';
 
 export const MesureList = (props) => {
     const [page, setPage] = React.useState(1);
@@ -65,7 +65,7 @@ export const MesureList = (props) => {
                                 <td>{dateFormat(mesure[3], 'dd/mm/yyyy')}</td>
                                 <td > dr moi </td>
                                 <td>{mesure[5] == null ? "mesure non terminée" : mesure[5] + "Ohm"}</td>
-                                <td><Link to={"/mesure/" + mesure[0]}><img src={'../../assets/icons/editer.png'} alt={''}/></Link> </td>
+                                <td><Link to={"/mesure/" + mesure[0]}><img src={edit} alt={''}/></Link> </td>
                             </tr>
                         )}
 
