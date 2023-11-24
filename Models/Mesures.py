@@ -39,13 +39,25 @@ class Mesures(Model):
 
 
     def start_save_mesure(self, mesure_id):
-        self._c.execute("INSERT INTO mesures_details (mesure_id, pression, debit) VALUES (?, '[]', '[]')", (mesure_id, 0, 0))
+
+        points = json.dumps([])
+        self._c.execute("INSERT INTO mesures_details (mesure_id, pression, debit) VALUES (?, ?, ?)", (mesure_id, points, points))
         self._c.commit()
 
-    def save_mesure_points(self, mesure_id, debit, pression):
-        self._c.execute("UPDATE mesures_details SET pression = ?, debit = ? WHERE mesure_id = ?", (pression, debit, mesure_id))
+    def clear_mesures_points(self, mesure_id):
+        points = json.dumps([])
+        self._c.execute("UPDATE mesures_details SET pression = ?, debit = ? WHERE mesure_id = ?", (points, points, mesure_id))
         self._c.commit()
+
+    @staticmethod
+    def save_mesure_points(database, mesure_id, debit, pression):
+        database.execute("UPDATE mesures_details SET pression = ?, debit = ? WHERE mesure_id = ?", (pression, debit, mesure_id))
+        database.commit()
 
     def get_mesure_points(self, mesure_id):
         res = self._c.execute("SELECT debit, pression FROM mesures_details WHERE mesure_id = ?", (mesure_id,))
-        return res.fetchone()
+        res = res.fetchone()
+        return {
+            "debit": json.loads(res[0]),
+            "pression": json.loads(res[1])
+        }

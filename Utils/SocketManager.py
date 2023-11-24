@@ -145,7 +145,8 @@ class SocketManager:
                         dataLenght += 1
 
                     print("Debit " + currentDebit.__str__() + " pression " + currentPression.__str__())
-                    Mesures(self.__database).save_mesure_points(mesureID, currentDebit, currentPression)
+
+                    Mesures.save_mesure_points(self.__database, mesureID, json.dumps(currentDebit), json.dumps(currentPression))
                 else:
                     self.__logger.print("SocketManager", 2, "Commande inconnue")
                     break
@@ -182,22 +183,31 @@ class SocketManager:
         return {"connected": self.connIsOk, "timedOut": self.timedOut}
 
     # Methode permettant d'envoyer les données de calibrage
-    def configure(self, debit, pression):
-        data = {"command": "calibrate", "debit": debit, "pression": pression}
+    def calibrateATM(self):
+        data = {"command": "calibrate:atm_pressure"}
         self.__sendMessage(data)
 
     # Methode permmettant de changer la fréquence de l'ampli
-    def changeFrequency(self, freq):
-        data = {"command": "changeFreq", "frequency": freq}
+    def calibratePressure(self, sendhPa):
+        data = {"command": "calibrate:pression", "send_hPa": sendhPa}
         self.__sendMessage(data)
 
-    # Methode permettant de démarer une mesure
+    def calibrateDebit(self):
+        data = {"command": "calibrate:deb"}
+        self.__sendMessage(data)
+
+    #Methode permettant de démarer une mesure
+    def initMesure(self, frequency, mesure_id):
+        data = {"command": "mesure:init", "frequency": frequency, "mesure_id": mesure_id}
+        self.__sendMessage(data)
+
     def startMesure(self):
-        data = self.__CommandToSet("startMesure")
+        data = {"command": "mesure:start"}
         self.__sendMessage(data)
 
     def stopMesure(self):
-        data = self.__CommandToSet("stopMesure")
+        data = {"command": "mesure:stop"}
+        self.__sendMessage(data)
 
 
 

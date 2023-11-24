@@ -1,6 +1,7 @@
 import React, {useContext, useEffect} from 'react';
 import UserContext from "../components/Context/UserContext.jsx";
 import {Link, Outlet, useNavigate} from "react-router-dom";
+import ErrorBoundary from "../components/Utils/ErrorBoundary.jsx";
 
 
 export const Layout = (props) => {
@@ -40,7 +41,9 @@ export const Layout = (props) => {
             </div>
 
             <div className={"Content"}>
-                <Outlet/>
+                <ErrorBoundary>
+                    <Outlet/>
+                </ErrorBoundary>
             </div>
 
 

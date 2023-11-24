@@ -17,12 +17,33 @@ export const MesureData = (props) => {
 
     const [data, setData] = React.useState([])
     const [updateRate, setUpdateRate] = React.useState(250)
+    const [mesureTime, setMesureTime] = React.useState(0)
 
 
 
     useEffect(() => {
 
-        getMesureInfos(); //Call static pour pouvoir tout mettre dans les options
+        getMesureInfos(); //Call bloquant pour pouvoir tout mettre dans les options
+
+        //initGraph()
+
+
+
+
+        const interval = setInterval(async () => {
+            setRunner((prevState) => prevState + 1)
+
+        }, updateRate);
+        return () => clearInterval(interval);
+
+
+    }, []);
+
+    const initGraph = (frequency = data[1]) => {
+
+        const secDuration = frequency * 8
+        const softMax = secDuration * 30
+
 
         setOptions( {
             chart: {
@@ -33,11 +54,11 @@ export const MesureData = (props) => {
                 text: 'Mesure'
             },
             xAxis: {
-                tickInterval: 8*updateRate,
-                softMax: 30*8*updateRate,
+                tickInterval: secDuration,
+                softMax: softMax,
                 labels: {
                     formatter: function () {
-                        return this.value / (8*updateRate);
+                        return this.value / secDuration;
                     }
                 }
             },
@@ -71,21 +92,16 @@ export const MesureData = (props) => {
 
         })
 
+    }
 
-
-        const interval = setInterval(async () => {
-            setRunner((prevState) => prevState + 1)
-
-        }, getMesureInfos);
-        return () => clearInterval(interval);
-
-
-    }, []);
-
-    const getMesureInfos =  () => {
-        myEel.get_mesure(id)().then((r) => {
+    const getMesureInfos =  async () => {
+        await myEel.get_mesure(id)().then((r) => {
             setData(r)
-            setUpdateRate(250)
+            setUpdateRate(Math.round(1000 / r[1]))
+            getSeries()
+            console.log(r)
+            initGraph(parseInt(r[1]))
+            setMesureTime(Math.round(current * 10 / (8 * parseInt(r[1]))) / 10 + "s")
         });
     }
 
@@ -103,17 +119,56 @@ export const MesureData = (props) => {
 
     }
 
+    const initMesure = async () => {
+        await myEel.init_mesure(parseInt(data[1]), parseInt(id) )().then((r) => {
+            setRunning(true)
+            console.log(r)
+
+        }).catch((e) => {
+            console.log(e)
+        });
+    }
+
+    const startMesure = async () => {
+        console.log("start")
+        await myEel.start_mesure(id)().then((r) => {
+            console.log(r)
+        }).catch((e) => {
+            console.log(e)
+        })
+
+
+
+    }
+
+    const stopMesure = () => {
+        console.log("stop")
+        myEel.stop_mesure()().then((r) => {
+
+            console.log(r)
+        }).catch((e) => {
+            console.log(e)
+        })
+
+        setRunning(false)
+
+    }
+
+
+
+
     const updateSeries = (pression, debit) => {
         const chartRef = chartComponent.current?.chart;
 
+        pression = Object.values(pression)
+        debit = Object.values(debit)
 
-        for (let i = current; i < pression.length; i++) {
-            chartRef.series[0].addPoint(debit[i])
-            chartRef.series[1].addPoint(pression[i])
 
-        }
+        chartRef.series[0].setData(debit)
+        chartRef.series[1].setData(pression)
 
-        setCurrent((prevState) => prevState + 8)
+        setCurrent(pression.length)
+        setMesureTime(Math.round(current * 10 / (8 * parseInt(data[1]))) / 10 + "s")
 
     }
 
@@ -132,9 +187,18 @@ export const MesureData = (props) => {
                 </div>
                 <div className={"mesure-container-footer"}>
                     <p>Nombre de mesures affiches {current}</p>
-                    <button className={"btn --big"} onClick={getSeries}>Ajouter</button>
-                    <button className={"btn --big"} onClick={() => {setRunning(true)}}>Start</button>
-                    <button className={"btn --big"} onClick={() => {setRunning(false)}}>Stop</button>
+                    <p>Temps de la mesure : {mesureTime} </p>
+                    {running &&
+                        <>
+                            <button onClick={startMesure} className={"btn"}>start</button>
+                            <button onClick={stopMesure} className={"btn"}>stop</button>
+                        </>
+                    }
+
+                    {!running &&
+                            <button onClick={initMesure} className={"btn"}>lancer</button>
+                    }
+
                 </div>
 
             </div>

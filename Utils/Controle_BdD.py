@@ -4,7 +4,7 @@ class Controle_BdD:
     def __init__(self, nom_bdd):
         print("oui")
         self.__nom_bdd = nom_bdd
-        self.__c = sqlite3.connect(self.__nom_bdd + '.db')
+        self.__c = sqlite3.connect(self.__nom_bdd + '.db', check_same_thread=False)
         self.verifier_tables()
 
     def verifier_tables(self):

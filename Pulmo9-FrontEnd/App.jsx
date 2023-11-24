@@ -14,6 +14,7 @@ import {Calibration} from "./Views/Calibration/Calibration.jsx";
 import {MesureList} from "./Views/Mesure/MesureList.jsx";
 import {MesurePrepare} from "./Views/Mesure/MesurePrepare.jsx";
 import {MesureData} from "./Views/Mesure/MesureData.jsx";
+import ErrorBoundary from "./components/Utils/ErrorBoundary.jsx";
 
 
 /* Custom socket events */
@@ -63,22 +64,26 @@ function App() {
     return (
 
             <UserContext.Provider value={{user: user, setUser: (v) => setUser(v), blConnected:blConnected}}>
+
                 <Routes>
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path={"/register"} element={<Register/>}/>
-                    <Route index element={<WaitAuth/>} />
-                    <Route path={"/"}  element={<Layout />}>
-                        <Route path={"patients"} element={<PatientList/>}/>
-                        <Route path={"patient/:id"} element={<PatientEditor/>}/>
-                        <Route path={"calibration"} element={<Calibration/>}/>
-                        <Route path={"patient/:id/mesures"} element={<MesureList/>}/>
-                        <Route path={"patient/:id/mesure/:idmesure"} element={<MesurePrepare/>}/>
-                        <Route path={"mesure/:id"} element={<MesureData/>}/>
 
-                        <Route path={"*"} element={<NoMatchRoute/>}/>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path={"/register"} element={<Register/>}/>
+                        <Route index element={<WaitAuth/>} />
+                        <Route path={"/"}  element={<Layout />}>
+                            <Route path={"patients"} element={<PatientList/>}/>
+                            <Route path={"patient/:id"} element={<PatientEditor/>}/>
+                            <Route path={"calibration"} element={<Calibration/>}/>
+                            <Route path={"patient/:id/mesures"} element={<MesureList/>}/>
+                            <Route path={"patient/:id/mesure/:idmesure"} element={<MesurePrepare/>}/>
+                            <Route path={"mesure/:id"} element={<MesureData/>}/>
 
-                    </Route>
+                            <Route path={"*"} element={<NoMatchRoute/>}/>
+
+                        </Route>
+
                 </Routes>
+
             </UserContext.Provider>
     )
 }

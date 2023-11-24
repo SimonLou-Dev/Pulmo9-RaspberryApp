@@ -27,8 +27,7 @@ export const Calibration = (props) => {
 
                 {step === 0 && <PressureCalibration nextStape={(v) => setStep(v)}/>}
                 {step === 1 && <PressureAtmosphericCalibration nextStape={(v) => setStep(v)}/>}
-                {step === 2 && <FlowCalibrationZero/>}
-                {step === 3 && <FlowCalibration/>}
+                {step === 2 && <FlowCalibration/> }
 
 
 
@@ -96,7 +95,7 @@ const PressureCalibration = (props) => {
     const sendCalibration = () => {
         let hpaPress = 0;
         if (calibrationMode == 1){
-            hpaPress = calibrationValue * 98.0665
+            hpaPress = calibrationValue * 0.980665
         }
         if (calibrationMode == 2){
             hpaPress = calibrationValue * 100000
@@ -166,7 +165,7 @@ const PressureAtmosphericCalibration = (props) => {
 
     const sendCalibration = () => {
         setCalibrationRunning(true)
-        myEel.calibrate_pression(2)().then((r) => {
+        myEel.calibrate_pression_atm()().then((r) => {
             if (r){
                 setInternalSteps(1)
                 setTimeout(() => {
@@ -181,7 +180,7 @@ const PressureAtmosphericCalibration = (props) => {
         return(
             <div className={"card-infos-content-calibration"}>
                 <h3>Préparation</h3>
-                <p>Remettez la machine en état originel. Puis appuyez sur pret</p>
+                <p>Remettez la machine en état originel. (Prennez garde a bien secher le tuyau) Puis appuyez sur pret</p>
 
                 <div className={"btn-group"}>
                     <button className={"btn --big"} id={"calibratePress"} onClick={sendCalibration}>Pret</button>
@@ -217,11 +216,32 @@ const PressureAtmosphericCalibration = (props) => {
 
 }
 
-const FlowCalibrationZero = (props) => {
-
-}
 
 const FlowCalibration = (props) => {
+    const [internalSteps, setInternalSteps] = useState(0)
+    const [calibrationRunning , setCalibrationRunning] = useState(false)
+
+    const sendCalibration = () => {
+        setCalibrationRunning(true)
+        myEel.calibrate_debit()().then((r) => {
+            if (r){
+                setInternalSteps(1)
+                setTimeout(() => {
+                    setCalibrationRunning(false)
+                }, 3000)
+            }
+        })
+    }
+
+    return (
+        <div className={"card-infos"}>
+            <div className={"card-infos-title"}>
+                <h2>Calibration du débit</h2>
+            </div>
+
+            <button className={"btn"} onClick={sendCalibration}>fullTest</button>
+        </div>
+    )
 
 }
 

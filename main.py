@@ -106,12 +106,20 @@ def create_patient(nom, prenom, DDN, taille, poid, sexe = 0, id = 0):
 @eel.expose
 def calibrate_pression(pression):
     #TODO: Faire la calibration
+    bl_conn.calibratePressure(pression)
     return True
 
 @eel.expose
 def calibrate_pression_atm():
     #TODO: Faire la calibration
+    bl_conn.calibrateATM()
     return True
+
+@eel.expose
+def calibrate_debit():
+    bl_conn.calibrateDebit()
+    return True
+    #TODO: Faire la calibration
 
 
 # list_mesure(int patient_id)
@@ -123,23 +131,39 @@ def list_mesure(patient_id, page):
 @eel.expose
 def create_mesure(patient_id, frequency):
     currentDateTime = datetime.datetime.now()
-    return Mesures(database).create_mesure(frequency, current_logged, currentDateTime, patient_id)
 
-# start_mesure(int mesure_id)
+    mesures = Mesures(database).create_mesure(frequency, current_logged, currentDateTime, patient_id)
+    Mesures(database).start_save_mesure(mesures[0])
 
-# init_mesure(int mesure_id)
+    return mesures
 
-# stop_mesure(int mesure_id)
+# init_mesure(int frequency, int mesure_id)
+@eel.expose
+def init_mesure(frequency, mesure_id):
+    bl_conn.initMesure(frequency, mesure_id)
+    return True
+
+# start_mesure(int id)
+@eel.expose
+def start_mesure(id):
+    bl_conn.startMesure()
+    Mesures(database).clear_mesures_points(id)
+    return True
+
+# stop_mesure()
+@eel.expose
+def stop_mesure():
+    bl_conn.stopMesure()
+    return True
 
 # update_current_mesure(int mesure_id)
 @eel.expose
 def get_mesure_points(mesure_id):
     return Mesures(database).get_mesure_points(mesure_id)
 
-
-# calibrate(int pression, int debit)
-
-# set_freq(int frequency);
+@eel.expose
+def get_mesure(mesure_id):
+    return Mesures(database).get_mesure(mesure_id)
 
 #Fin des fonction eel exportés
 
