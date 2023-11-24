@@ -136,7 +136,7 @@ class SocketManager:
                     for i in range(0, len(data)):
                         debit = data[i]["debit"]
                         pression = data[i]["pression"]
-                        if debit >= -0.001 and debit <= 0.001:
+                        if debit >= -0.0001 and debit <= 0.0001:
                             debit = 0
                         currentDebit.update({dataLenght: round(debit,4)})
                         if pression >= -0.001 and pression <= 0.001:
