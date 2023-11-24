@@ -136,12 +136,12 @@ class SocketManager:
                     for i in range(0, len(data)):
                         debit = data[i]["debit"]
                         pression = data[i]["pression"]
-                        if debit >= -0.0001 and debit <= 0.0001:
+                        if debit >= -0.01 and debit <= 0.01:
                             debit = 0
                         currentDebit.update({dataLenght: round(debit,4)})
-                        if pression >= -0.0001 and pression <= 0.0001:
+                        if pression >= -0.1 and pression <= 0.1:
                             pression = 0
-                        currentPression.update({dataLenght: round(pression,4)})
+                        currentPression.update({dataLenght: round(pression*10,4)})
                         dataLenght += 1
 
                     print("Debit " + currentDebit.__str__() + " pression " + currentPression.__str__())
